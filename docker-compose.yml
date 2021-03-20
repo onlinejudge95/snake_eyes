@@ -1,0 +1,22 @@
+version: "3.8"
+
+networks:
+  snake_eyes:
+    driver: bridge
+    name: snake_eyes
+
+services:
+  snake_eyes:
+    command: "gunicorn --bind 0.0.0.0:8000 --access-logfile - --reload snake_eyes.app:create_app()"
+    networks:
+      - snake_eyes
+    volumes:
+      - ".:/snake_eyes"
+      - "./instance:/snake_eyes/instance"
+    ports:
+      - "8000:8000"
+    build:
+      context: "."
+      dockerfile: "Dockerfile"
+    environment:
+      PYTHONUNBUFFERRED: "true"
