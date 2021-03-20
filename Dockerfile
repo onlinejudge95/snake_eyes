@@ -16,4 +16,6 @@ RUN pip install --no-cache-dir /wheels/*
 
 COPY . .
 
+RUN pip install --editable /snake_eyes
+
 CMD ["bash", "/snake_eyes/bin/entrypoint.sh"]
