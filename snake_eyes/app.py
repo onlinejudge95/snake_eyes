@@ -1,6 +1,7 @@
 from flask import Flask
 
 from snake_eyes.blueprints.page import page_bp
+from snake_eyes.extensions import debug_toolbar
 
 
 def create_app(settings_override=None):
@@ -14,4 +15,16 @@ def create_app(settings_override=None):
 
     app.register_blueprint(page_bp)
 
+    init_extensioins(app)
+
     return app
+
+
+def init_extensioins(app):
+    """
+    Registers extensions by lazy loading.
+    This mutates the app object
+
+    :param app: snake_eyes application isntance
+    """
+    debug_toolbar.init_app(app)
