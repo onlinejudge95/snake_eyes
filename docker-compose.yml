@@ -16,6 +16,8 @@ services:
     build:
       context: "."
       dockerfile: "Dockerfile"
+    environment:
+      PYTHONUNBUFFERRED: "true"
 
   redis:
     command: "redis-server --requirepass devpassword"
