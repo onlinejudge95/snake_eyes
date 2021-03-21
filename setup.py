@@ -11,6 +11,6 @@ setup(
     ],
     entry_points="""
         [console_scripts]
-        snakeeyes=cli.cli:cli
+        snake_eyes=cli.cli:cli
     """,
 )

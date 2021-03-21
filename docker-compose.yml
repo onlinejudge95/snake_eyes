@@ -6,8 +6,31 @@ networks:
     name: snake_eyes
 
 services:
+  celery:
+    command: "celery --app snake_eyes.blueprints.contact.tasks worker --loglevel info"
+    networks:
+      - snake_eyes
+    volumes:
+      - ".:/snake_eyes"
+      - "./instance:/snake_eyes/instance"
+    build:
+      context: "."
+      dockerfile: "Dockerfile"
+    environment:
+      PYTHONUNBUFFERRED: "true"
+
+  redis:
+    command: "redis-server --requirepass devpassword"
+    image: "redis:6.2.1-alpine"
+    networks:
+      - snake_eyes
+    ports:
+      - "6379:6379"
+    volumes:
+      - "redis-data:/var/lib/redis/data"
+
   snake_eyes:
-    command: "gunicorn --bind 0.0.0.0:8000 --access-logfile - --reload snake_eyes.app:create_app()"
+    command: "gunicorn --capture-output --bind 0.0.0.0:8000 --access-logfile - --reload snake_eyes.app:create_app()"
     networks:
       - snake_eyes
     volumes:
@@ -20,3 +43,6 @@ services:
       dockerfile: "Dockerfile"
     environment:
       PYTHONUNBUFFERRED: "true"
+
+volumes:
+  redis-data:

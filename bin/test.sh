@@ -2,10 +2,10 @@
 
 
 # Run linting
-docker-compose exec snake_eyes snakeeyes lint --skip-init /snake_eyes
+docker-compose exec snake_eyes snake_eyes lint --skip-init /snake_eyes
 
 # Run tests
-docker-compose exec snake_eyes snakeeyes test snake_eyes/tests
+docker-compose exec snake_eyes snake_eyes test snake_eyes/tests
 
 # Run coverage
-docker-compose exec snake_eyes snakeeyes coverage snake_eyes/tests
+docker-compose exec snake_eyes snake_eyes coverage snake_eyes/tests
