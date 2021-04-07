@@ -1,0 +1,26 @@
+image: docker:stable
+
+stages:
+  - build
+
+variables:
+  IMAGE: snake_eyes
+  REGISTRY_URL: $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
+  DOCKER_HOST: tcp://docker:2375
+
+build:
+  stage: build
+  image:
+    name: amazon/aws-cli
+    entrypoint: [""]
+  services:
+    - docker:dind
+  before_script:
+    - amazon-linux-extras install docker
+    - aws --version
+    - docker --version
+    - docker login --username AWS --password `aws ecr get-login-password` $REGISTRY_URL
+  script:
+    - docker image build --tag $REGISTRY_URL/$IMAGE:$CI_COMMIT_SHA .
+  after_script:
+    - docker image push $REGISTRY_URL/$IMAGE:$CI_COMMIT_SHA
