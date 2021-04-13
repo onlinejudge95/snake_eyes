@@ -28,6 +28,10 @@ body {
   margin-bottom: 60px;
 }
 
+.md-margin-bottom {
+  margin-bottom: 40px;
+}
+
 .lg-margin-top {
   margin-top: 60px;
 }

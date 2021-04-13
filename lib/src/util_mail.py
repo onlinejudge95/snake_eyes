@@ -14,7 +14,12 @@ def send_templated_message(template=None, context={}, *args, **kwargs):
 
     Example:
         ctx = {'user': current_user, 'reset_token': token}
-        send_template_message('Password reset from Foo', ['you@example.com'], template='user/mail/password_reset', ctx=ctx)
+        send_template_message(
+            'Password reset from Foo',
+            ['you@example.com'],
+            template='user/mail/password_reset',
+            context=context
+        )
 
     :param subject:
     :param recipients:
@@ -39,10 +44,14 @@ def send_templated_message(template=None, context={}, *args, **kwargs):
             raise Exception("You cannot have both a template and body arg.")
         elif "html" in kwargs:
             raise Exception("You cannot have both a template and body arg.")
-        
+
         kwargs["body"] = _render_template(template, **context)
-        kwargs["html"] = _render_template(template, extension="html", **context)
-    
+        kwargs["html"] = _render_template(
+            template,
+            extension="html",
+            **context
+        )
+
     mail.send_message(*args, **kwargs)
 
 

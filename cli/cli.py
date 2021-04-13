@@ -15,7 +15,11 @@ class SnakeEyesCLI(MultiCommand):
         :param ctx: Click context
         :return: List of sorted commands
         """
-        return sorted([filename[8:-3] for filename in os.listdir(self.COMMANDS_DIR) if filename.endswith('.py') and filename.startswith(self.COMMAND_PREFIX)])
+        return sorted([
+            fname[8:-3]
+            for fname in os.listdir(self.COMMANDS_DIR)
+            if fname.endswith('.py') and fname.startswith(self.COMMAND_PREFIX)
+        ])
 
     def get_command(self, ctx, name):
         """
@@ -26,7 +30,10 @@ class SnakeEyesCLI(MultiCommand):
         :return: Module's cli function
         """
         namespace = {}
-        filename = os.path.join(self.COMMANDS_DIR, f"{self.COMMAND_PREFIX}{name}.py")
+        filename = os.path.join(
+            self.COMMANDS_DIR,
+            f"{self.COMMAND_PREFIX}{name}.py"
+        )
 
         with open(filename, "r") as fp:
             code = compile(fp.read(), filename, "exec")

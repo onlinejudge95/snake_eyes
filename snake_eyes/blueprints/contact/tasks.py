@@ -1,4 +1,4 @@
-from lib.src.mail import send_templated_message
+from lib.src.util_mail import send_templated_message
 from snake_eyes.app import create_celery
 
 
@@ -18,4 +18,10 @@ def deliver_contact_email(email, message):
     """
     context = {"email": email, "message": message}
 
-    send_templated_message(subject="[Snake Eyes] Contact", sender=email, recipients=[celery.conf.get("MAIL_USERNAME")], reply_to=email, template="contact/mail/index", context=context)
+    send_templated_message(
+        subject="[Snake Eyes] Contact",
+        sender=email,
+        recipients=[celery.conf.get("MAIL_USERNAME")],
+        reply_to=email,
+        template="contact/mail/index", context=context
+    )

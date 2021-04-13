@@ -1,8 +1,12 @@
 from flask_debugtoolbar import DebugToolbarExtension
+from flask_login import LoginManager
 from flask_mail import Mail
-from flask_wtf.csrf import CSRFProtect
+from flask_sqlalchemy import SQLAlchemy
+from flask_wtf.csrf import CsrfProtect
 
 
+db = SQLAlchemy()
 debug_toolbar = DebugToolbarExtension()
+login_manager = LoginManager()
 mail = Mail()
-csrf = CSRFProtect()
+csrf = CsrfProtect()
