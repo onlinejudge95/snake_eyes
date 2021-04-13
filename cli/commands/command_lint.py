@@ -6,7 +6,11 @@ from click import option
 
 
 @command()
-@option("--skip-init/--no-skip-init", default=True, help="Skip __init__.py files?")
+@option(
+    "--skip-init/--no-skip-init",
+    default=True,
+    help="Skip __init__.py files?"
+)
 @argument("path", default="/snake_eyes")
 def cli(skip_init, path):
     """
@@ -19,5 +23,5 @@ def cli(skip_init, path):
     :return: Subprocess call result
     """
     flag = ",__init__.py" if skip_init else ""
-    shell_command = f"flake8 --exclude env{flag} {path}"
+    shell_command = f"flake8 --exclude instance*,env{flag} {path}"
     return subprocess.call(shell_command, shell=True)

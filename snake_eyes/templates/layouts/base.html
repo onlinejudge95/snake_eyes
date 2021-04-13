@@ -26,26 +26,8 @@
             crossorigin="anonymous"></script>
   </head>
   <body>
-    <nav class="navbar navbar-default navbar-fixed-top">
-      <div class="container">
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle collapsed"
-                  data-toggle="collapse" data-target="#navbar"
-                  aria-expanded="false" aria-controls="navbar">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a href="{{ url_for('page.home') }}">
-            <img src="{{ url_for('static', filename='images/snake-eyes.jpg') }}"
-                 class="img-responsive"
-                 width="229" height="50" title="Snake Eyes" alt="Snake Eyes"/>
-          </a>
-        </div>
-      </div>
-    </nav>
-
+    {% block header %}{% endblock %}
+    
     <main class="container">
       {{ flash.render() }}
 
@@ -57,9 +39,7 @@
       <div class="container">
         <ul class="list-inline">
           <li class="text-muted">Snake Eyes &copy; 2016</li>
-          <li><a href="{{ url_for('contact.index') }}">Contact</a></li>
-          <li><a href="{{ url_for('page.privacy') }}">Privacy Policy</a></li>
-          <li><a href="{{ url_for('page.terms') }}">Terms of Service</a></li>
+          {% block footer %}{% endblock %}
         </ul>
       </div>
     </footer>

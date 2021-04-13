@@ -6,8 +6,24 @@ networks:
     name: snake_eyes
 
 services:
+  postgres:
+    image: postgres:9.5
+    networks:
+      - snake_eyes
+    ports:
+      - 5432:5432
+    volumes:
+      - "postgres-data:/var/lib/postgresql/data"
+    environment:
+      POSTGRES_DB: snake_eyes
+      POSTGRES_USER: snake_eyes
+      POSTGRES_PASSWORD: devpassword
+
   celery:
-    command: "celery --app snake_eyes.blueprints.contact.tasks worker --loglevel info"
+    command: "celery worker --app snake_eyes.blueprints.contact.tasks --loglevel info"
+    depends_on:
+      - postgres
+      - redis
     networks:
       - snake_eyes
     volumes:
@@ -21,7 +37,7 @@ services:
 
   redis:
     command: "redis-server --requirepass devpassword"
-    image: "redis:6.2.1-alpine"
+    image: "redis:3.0-alpine"
     networks:
       - snake_eyes
     ports:
@@ -30,7 +46,10 @@ services:
       - "redis-data:/var/lib/redis/data"
 
   snake_eyes:
-    command: "gunicorn --capture-output --bind 0.0.0.0:8000 --access-logfile - --reload snake_eyes.app:create_app()"
+    command: "gunicorn --workers 4 --bind 0.0.0.0:8000 --access-logfile - --reload snake_eyes.app:create_app()"
+    depends_on:
+      - postgres
+      - redis
     networks:
       - snake_eyes
     volumes:
@@ -44,5 +63,16 @@ services:
     environment:
       PYTHONUNBUFFERRED: "true"
 
+  # visualizer:
+  #   image: dockersamples/visualizer
+  #   networks:
+  #     - snake_eyes
+  #   ports:
+  #     - 8080:8080
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock
+
+
 volumes:
+  postgres-data:
   redis-data:

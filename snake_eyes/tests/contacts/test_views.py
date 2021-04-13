@@ -1,6 +1,6 @@
 from flask import url_for
 
-from lib.tests.test_mail import assert_status_with_message
+from lib.src.util_tests import assert_status_with_message
 
 
 class TestContactView:
@@ -23,6 +23,10 @@ class TestContactView:
         }
 
         contact_page_url = url_for("contact.index")
-        response = client.post(contact_page_url, data=payload, follow_redirects=True)
+        response = client.post(
+            contact_page_url,
+            data=payload,
+            follow_redirects=True
+        )
 
         assert_status_with_message(200, response, "Thanks")
