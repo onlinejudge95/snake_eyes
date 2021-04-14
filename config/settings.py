@@ -1,5 +1,7 @@
 DEBUG = True
 
+LOG_LEVEL = "DEBUG"
+
 SERVER_NAME = "localhost:8000"
 SECRET_KEY = "secret_key"
 

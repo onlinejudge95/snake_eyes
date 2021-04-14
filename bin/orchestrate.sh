@@ -8,6 +8,7 @@ if [[ $# -lt 1 ]]; then
     echo "build   : Build the images before starting the containers"
     echo "deploy  : Deploy all services"
     echo "restart : Restart a single service"
+    echo "stop    : Stop services service"
     echo "destroy : Destroy all services"
     echo "cleanup : Prunes all build aritfacts"
     echo "lint    : Checks for linting"
@@ -38,6 +39,15 @@ restart)
 
     docker-compose up --detach $SERVICE
 ;;
+stop)
+    SERVICE=$2
+    if [[ -z $SERVICE ]]; then
+        echo "Please provide a service to restart"
+        exit 1
+    fi
+
+    docker-compose stop $SERVICE
+;;
 destroy)
     docker-compose down --remove-orphans
 ;;
@@ -54,8 +64,19 @@ coverage)
     docker-compose exec snake_eyes snake_eyes coverage snake_eyes/tests
 ;;
 all)
-    pip install --editable .
-    docker-compose build --compress --parallel
+    SERVICE=$2
+    if [[ -z $SERVICE ]]; then
+        echo "Please provide a service to restart"
+        exit 1
+    fi
+
+    if [[ $SERVICE = "snake_eyes" ]]; then
+        pip install --editable .
+        docker-compose build --compress --parallel
+        docker-compose stop celery snake_eyes
+        docker-compose rm --force celery snake_eyes
+        docker-compose up --detach $SERVICE
+    fi
     docker-compose up --detach
 ;;
 esac
