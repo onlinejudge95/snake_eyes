@@ -210,9 +210,7 @@ class TestSignupView(ViewTestMixin):
     #     Test welcome page renders correctly
     #     """
     #     self.login()
-        
     #     response = self.client.get(url_for("user.welcome"))
-
     #     assert response.status_code == 200
 
     def test_begin_signup_fail_logged_in(self, users):
@@ -267,7 +265,9 @@ class TestSignupView(ViewTestMixin):
         new_user_count = User.query.count()
 
         assert old_user_count + 1 == new_user_count
-        assert User.find_by_identity("user@localhost").password != user["password"]
+        assert User \
+            .find_by_identity("user@localhost") \
+            .password != user["password"]
 
     def test_welcome(self):
         """
@@ -341,7 +341,10 @@ class TestUpdateCredentialsView(ViewTestMixin):
         """
         self.login()
 
-        user = {"current_password": "wrongpassword", "email": "admin@localhost"}
+        user = {
+            "current_password": "wrongpassword",
+            "email": "admin@localhost"
+        }
         response = self.client.post(
             url_for("user.update_credentials"),
             data=user,
@@ -398,7 +401,11 @@ class TestUpdateCredentialsView(ViewTestMixin):
         """
         self.login()
 
-        user = {"current_password": "password", "email": "admin@localhost", "password": "newpassword"}
+        user = {
+            "current_password": "password",
+            "email": "admin@localhost",
+            "password": "newpassword"
+        }
         response = self.client.post(
             url_for("user.update_credentials"),
             data=user,
@@ -418,7 +425,11 @@ class TestUpdateCredentialsView(ViewTestMixin):
         """
         self.login()
 
-        user = {"current_password": "password", "email": "admin2@localhost", "password": "newpassword"}
+        user = {
+            "current_password": "password",
+            "email": "admin2@localhost",
+            "password": "newpassword"
+        }
         response = self.client.post(
             url_for("user.update_credentials"),
             data=user,

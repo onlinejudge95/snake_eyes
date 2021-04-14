@@ -2,6 +2,7 @@ from celery import Celery
 from flask import Flask
 from itsdangerous import URLSafeTimedSerializer
 
+from snake_eyes.blueprints.admin import admin_bp
 from snake_eyes.blueprints.page import page_bp
 from snake_eyes.blueprints.contact import contact_bp
 from snake_eyes.blueprints.user import user_bp
@@ -31,6 +32,7 @@ def create_app(settings_override=None):
     app.register_blueprint(page_bp)
     app.register_blueprint(contact_bp)
     app.register_blueprint(user_bp)
+    app.register_blueprint(admin_bp)
 
     init_extensions(app)
     authentication(app, User)

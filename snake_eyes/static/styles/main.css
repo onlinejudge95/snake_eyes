@@ -50,6 +50,10 @@ label {
   font-weight: 400;
 }
 
+.checkbox input[type='checkbox'], .checkbox-inline input[type='checkbox'] {
+  margin-left: 0;
+}
+
 .alert-small {
   padding: 5px;
   margin-bottom: 0;
@@ -67,4 +71,48 @@ label {
 
 .alert-error .alert-link, .alert-message .alert-link {
   color: #843534;
+}
+
+.col-header {
+  height: 26px;
+}
+
+dd {
+  margin-bottom: 8px;
+}
+
+/* Admin dashboard
+-------------------------------------------------- */
+#bulk_actions {
+  display: none;
+  padding-bottom: 8px;
+}
+
+#scope {
+  margin-bottom: 0;
+  width: 160px;
+  height: 29px;
+  font-weight: 400;
+  font-size: 12px;
+}
+
+.sort:after {
+  content: '\f0dc';
+  font-family: FontAwesome;
+  margin-left: 6px;
+  color: #BBB;
+}
+
+.asc:after {
+  content: '\f0dd';
+  font-family: FontAwesome;
+  margin-left: 6px;
+  color: #444;
+}
+
+.desc:after {
+  content: '\f0de';
+  font-family: FontAwesome;
+  margin-left: 6px;
+  color: #444;
 }
