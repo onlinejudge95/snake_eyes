@@ -33,7 +33,7 @@ services:
       context: "."
       dockerfile: "Dockerfile"
     environment:
-      PYTHONUNBUFFERRED: "true"
+      PYTHONUNBUFFERED: "true"
 
   redis:
     command: "redis-server --requirepass devpassword"
@@ -46,7 +46,7 @@ services:
       - "redis-data:/var/lib/redis/data"
 
   snake_eyes:
-    command: "gunicorn --workers 4 --bind 0.0.0.0:8000 --access-logfile - --reload snake_eyes.app:create_app()"
+    command: "gunicorn --config 'python:config.gunicorn' --reload snake_eyes.app:create_app()"
     depends_on:
       - postgres
       - redis
@@ -61,7 +61,7 @@ services:
       context: "."
       dockerfile: "Dockerfile"
     environment:
-      PYTHONUNBUFFERRED: "true"
+      PYTHONUNBUFFERED: "true"
 
   # visualizer:
   #   image: dockersamples/visualizer

@@ -1,6 +1,12 @@
+from logging.handlers import SMTPHandler
+from logging import ERROR
+from logging import Formatter
+
 from celery import Celery
 from flask import Flask
+from flask import render_template
 from itsdangerous import URLSafeTimedSerializer
+from werkzeug.contrib.fixers import ProxyFix
 
 from snake_eyes.blueprints.admin import admin_bp
 from snake_eyes.blueprints.page import page_bp
@@ -28,6 +34,12 @@ def create_app(settings_override=None):
 
     if settings_override:
         app.config.update(settings_override)
+
+    app.logger.setLevel(app.config["LOG_LEVEL"])
+
+    middleware(app)
+    error_handler(app)
+    exception_handler(app)
 
     app.register_blueprint(page_bp)
     app.register_blueprint(contact_bp)
@@ -106,3 +118,62 @@ def authentication(app, user_model):
         user_uid = data[0]
 
         return user_model.query.get(user_uid)
+
+
+def middleware(app):
+    """
+    Registers the given middlewares.
+
+    :param app: Flask app instance
+    """
+    app.wsgi_app = ProxyFix(app.wsgi_app)
+
+
+def error_handler(app):
+    """
+    Regsiter custom error handler on app level
+
+    :param app: Flask app instance
+    """
+    def render_status(status):
+        """
+        Render custom tempaltes for specific errors
+
+        :param status: Status to show
+        :type status: str
+        """
+        status_code = getattr(status, "code", 500)
+        return render_template(f"errors/{status_code}.html"), status_code
+
+    for error in [404, 500]:
+        app.errorhandler(error)(render_status)
+
+
+def exception_handler(app):
+    """
+    Regsiter custom exception handler on app level
+
+    :param app: Flask app instance
+    """
+    mail_handler = SMTPHandler(
+        (app.config.get("MAIL_SERVER"), app.config.get("MAIL_PORT")),
+        app.config.get("MAIL_USERNAME"),
+        [app.config.get("MAIL_USERNAME")],
+        "[Exception Handler] A 5xx was thrown",
+        (app.config.get("MAIL_USERNAME"), app.config.get("MAIL_PASSWORD")),
+        secure=()
+    )
+    mail_handler.setLevel(ERROR)
+    mail_handler.setFormatter(
+        Formatter(
+            """
+            Time        : %(asctime)s
+            Message Type: %(levelname)s
+
+            Message:
+
+            %(message)s
+            """
+        )
+    )
+    app.logger.addHandler(mail_handler)
