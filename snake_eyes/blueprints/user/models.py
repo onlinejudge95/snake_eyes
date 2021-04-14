@@ -7,6 +7,7 @@ from flask_login import UserMixin
 from itsdangerous import TimedJSONWebSignatureSerializer
 from itsdangerous import URLSafeTimedSerializer
 from pytz import utc
+from sqlalchemy import or_
 from werkzeug.security import check_password_hash
 from werkzeug.security import generate_password_hash
 
@@ -116,6 +117,51 @@ class User(UserMixin, ResourceMixin, db.Model):
         deliever_password_reset_mail.delay(user.id, reset_token)
 
         return user
+
+    @classmethod
+    def search(cls, query):
+        """
+        Search a resource by one or more fields
+        :param query: Search query
+        :type query: str
+        return: SQLAlchemy filter
+        """
+        if not query:
+            return ""
+
+        search_query = f"%{query}%"
+        search_chain = (
+            User.email.ilike(search_query),
+            User.username.ilike(search_query)
+        )
+
+        return or_(*search_chain)
+
+    @classmethod
+    def is_last_admin(cls, user, new_role, new_active):
+        """
+        Checks if this user is the last admin.
+        Last admin can not remove themselves from the admins list.
+
+        :param user: User being tested
+        :type user: User
+        :param new_role: New role being set
+        :type new_role: str
+        :param new_active: New active status being set
+        :type new_active: bool
+        :return: bool
+        """
+        is_changing_roles = user.role == "admin" and new_role != "admin"
+        is_changing_active = user.active is True and new_active is None
+
+        if is_changing_roles or is_changing_active:
+            admin_count = User.query.filter(User.role == "admin").count()
+            active_count = User.query.filter(User.is_active is True).count()
+
+            if admin_count == 1 or active_count == 1:
+                return True
+
+        return False
 
     def is_active(self):
         """
