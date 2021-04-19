@@ -39,7 +39,7 @@ def send_templated_message(template=None, context={}, *args, **kwargs):
     :param context: Dictionary of anything you want in the template context
     :return: None
     """
-    if template:
+    if template is not None:
         if "body" in kwargs:
             raise Exception("You cannot have both a template and body arg.")
         elif "html" in kwargs:

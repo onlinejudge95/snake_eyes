@@ -59,8 +59,70 @@
     {% endcall %}
   </div>
   <div class="col-md-5 col-md-push-1 col-md-offset-1">
-    <h3>Login activity</h3>
+    <h3>Subscription details</h3>
+    {% include 'admin/user/_billing_details.html' with context %}
+    <div class="panel panel-default">
+      <div class="panel-body">
+        <dl>
+          {% if user.subscription and user.credit_card %}
+            <dt>Subscribed</dt>
+            <dd class="sm-margin-bottom">
+              <time class="from-now"
+                    data-datetime="{{ user.subscription.created_on }}">
+                {{ user.subscription.created_on }}
+              </time>
+              (<a href="#billing_details"
+                data-toggle="modal"
+                data-target="#billing_details">View billing details</a>)
+            </dd>
+            <dt>Plan</dt>
+            <dd class="sm-margin-bottom">
+              {{ user.subscription.plan | title }}
+              {% if user.subscription.coupon %}
+                <span class="small text-muted">
+                  (coupon: {{ user.subscription.coupon }})
+                </span>
+              {% endif %}
+            </dd>
+            <dt>Credit card</dt>
+            <dd class="sm-margin-bottom">
+              {{ user.name }}<br/>
+              {{ user.credit_card.brand }}
+              ****{{ user.credit_card.last4 }}
+              ({{ user.credit_card.exp_date.strftime('%m/%Y') }})
+            </dd>
+            {% call f.form_tag('admin.users_cancel_subscription') %}
+              <input type="hidden" id="id" name="id" value="{{ user.id }}"/>
+              <button type="submit" class="btn btn-danger">
+                <img src="{{ url_for('static', filename='images/spinner.gif') }}"
+                    class="spinner"
+                    width="16" height="11" alt="Spinner"/>
+                  Cancel subscription
+              </button>
+            {% endcall %}
+          {% else %}
+            {% if user.cancelled_subscription_on %}
+              <dt>Cancelled</dt>
+              <dd>
+                <time class="from-now"
+                      data-datetime="{{ user.cancelled_subscription_on }}">
+                  {{ user.cancelled_subscription_on }}
+                </time>
+              {% if user.invoices %}
+                (<a href="#billing_details"
+                  data-toggle="modal"
+                  data-target="#billing_details">View billing history</a>)
+              {% endif %}
+              </dd>
+            {% else %}
+              <p>This user has never subscribed.</p>
+            {% endif %}
+          {% endif %}
+        </dl>
+      </div>
+    </div>
 
+    <h3>Login activity</h3>
     <div class="panel panel-default">
       <div class="panel-body">
         <dl>

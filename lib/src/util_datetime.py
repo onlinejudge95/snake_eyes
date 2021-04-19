@@ -1,5 +1,8 @@
-import datetime as dt
-import pytz
+from datetime import date
+from datetime import datetime
+from datetime import timedelta
+
+from pytz import utc
 
 
 def tz_aware_datetime():
@@ -7,7 +10,7 @@ def tz_aware_datetime():
     Utility to return a timezone aware date time object
     :return: Datetime
     """
-    return dt.datetime.now(pytz.utc)
+    return datetime.now(utc)
 
 
 def timedelta_month(months, compare_date=None):
@@ -18,8 +21,6 @@ def timedelta_month(months, compare_date=None):
     :return: datetime
     """
     if compare_date is None:
-        compare_date = dt.datetime.today()
+        compare_date = date.today()
 
-    delta = months * 365 / 12
-
-    return compare_date + dt.timedelta(delta)
+    return compare_date + timedelta(months * 365 / 12)

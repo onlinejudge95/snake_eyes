@@ -50,18 +50,21 @@ stop)
 ;;
 destroy)
     docker-compose down --remove-orphans
+    docker container prune --force
+    docker volume prune --force
+    docker rmi --force $(docker image ls --quiet --filter "dangling=true")
 ;;
 cleanup)
     docker system prune --all --force --volumes
 ;;
 lint)
-    docker-compose exec snake_eyes snake_eyes lint --skip-init /snake_eyes
+    docker-compose exec website snake_eyes lint --skip-init /snake_eyes
 ;;
 test)
-    docker-compose exec snake_eyes snake_eyes test snake_eyes/tests
+    docker-compose exec website snake_eyes test snake_eyes/tests/billing/test_models.py::TestCreditCard
 ;;
 coverage)
-    docker-compose exec snake_eyes snake_eyes coverage snake_eyes/tests
+    docker-compose exec website snake_eyes coverage snake_eyes/tests
 ;;
 all)
     SERVICE=$2
@@ -73,8 +76,8 @@ all)
     if [[ $SERVICE = "snake_eyes" ]]; then
         pip install --editable .
         docker-compose build --compress --parallel
-        docker-compose stop celery snake_eyes
-        docker-compose rm --force celery snake_eyes
+        docker-compose stop celery website
+        docker-compose rm --force celery website
         docker-compose up --detach $SERVICE
     fi
     docker-compose up --detach
