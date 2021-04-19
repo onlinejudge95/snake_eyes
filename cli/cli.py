@@ -1,11 +1,13 @@
-import os
+from os import listdir
+from os.path import dirname
+from os.path import join as join_path
 
 from click import MultiCommand
 from click import command
 
 
 class SnakeEyesCLI(MultiCommand):
-    COMMANDS_DIR = os.path.join(os.path.dirname(__file__), "commands")
+    COMMANDS_DIR = join_path(dirname(__file__), "commands")
     COMMAND_PREFIX = "command_"
 
     def list_commands(self, ctx):
@@ -17,7 +19,7 @@ class SnakeEyesCLI(MultiCommand):
         """
         return sorted([
             fname[8:-3]
-            for fname in os.listdir(self.COMMANDS_DIR)
+            for fname in listdir(self.COMMANDS_DIR)
             if fname.endswith('.py') and fname.startswith(self.COMMAND_PREFIX)
         ])
 
@@ -30,7 +32,7 @@ class SnakeEyesCLI(MultiCommand):
         :return: Module's cli function
         """
         namespace = {}
-        filename = os.path.join(
+        filename = join_path(
             self.COMMANDS_DIR,
             f"{self.COMMAND_PREFIX}{name}.py"
         )

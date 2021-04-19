@@ -1,8 +1,22 @@
+from datetime import date
+from datetime import datetime
+
+from mock import Mock
 import pytest
+from pytz import utc
 
 from config import settings
+from lib.src.util_datetime import timedelta_month
 from snake_eyes.app import create_app
 from snake_eyes.extensions import db as _db
+from snake_eyes.blueprints.billing.gateways.stripecom import Card as PaymentCard  # noqa : E501
+from snake_eyes.blueprints.billing.gateways.stripecom import Coupon as PaymentCoupon  # noqa : E501
+from snake_eyes.blueprints.billing.gateways.stripecom import Event as PaymentEvent  # noqa : E501
+from snake_eyes.blueprints.billing.gateways.stripecom import Invoice as PaymentInvoice  # noqa : E501
+from snake_eyes.blueprints.billing.gateways.stripecom import Subscription as PaymentSubscription  # noqa : E501
+from snake_eyes.blueprints.billing.models.coupon import Coupon
+from snake_eyes.blueprints.billing.models.credit_card import CreditCard
+from snake_eyes.blueprints.billing.models.subscription import Subscription
 from snake_eyes.blueprints.user.models import User
 
 
@@ -89,9 +103,7 @@ def token(db):
     :param db: Pytest db fixture
     :return: JWS Token
     """
-    user = User.find_by_identity("admin@localhost")
-
-    return user.serialize_token()
+    return User.find_by_identity("admin@localhost").serialize_token()
 
 
 @pytest.fixture(scope="function")
@@ -117,3 +129,199 @@ def users(db):
     db.session.commit()
 
     return db
+
+
+@pytest.fixture(scope="function")
+def credit_cards(db):
+    """
+    Create fixture for credit cards
+    :param db: Pytest fixture
+    :return: SQLAlchemy database instance
+    """
+    db.session.query(CreditCard).delete()
+
+    may_1_2021 = date(2021, 5, 1)
+    june_1_2021 = utc.localize(datetime(2021, 6, 14, 0, 0, 0))
+
+    credit_cards = [
+        {
+            "user_id": 1, "brand": "Visa", "last4": 4242,
+            "exp_date": june_1_2021
+        },
+        {
+            "user_id": 2, "brand": "Visa", "last4": 4242,
+            "exp_date": timedelta_month(12, may_1_2021)
+        },
+    ]
+
+    for credit_card in credit_cards:
+        db.session.add(CreditCard(**credit_card))
+
+    db.session.commit()
+    return db
+
+
+@pytest.fixture(scope="function")
+def coupons(db):
+    """
+    Create coupon fixtures.
+
+    :param db: Pytest fixture
+    :return: SQLAlchemy database session
+    """
+    db.session.query(Coupon).delete()
+
+    may_1_2021 = utc.localize(datetime(2021, 5, 1, 0, 0, 0))
+    june_1_2021 = utc.localize(datetime(2021, 6, 1, 0, 0, 0))
+
+    coupons = [
+        {"amount_off": 1, "redeem_by": may_1_2021},
+        {"amount_off": 1, "redeem_by": june_1_2021},
+        {"amount_off": 1},
+    ]
+
+    for coupon in coupons:
+        db.session.add(Coupon(**coupon))
+
+    db.session.commit()
+
+    return db
+
+
+@pytest.fixture(scope="function")
+def subscriptions(db):
+    """
+    Create subscription fixtures.
+
+    :param db: Pytest fixture
+    :return: SQLAlchemy database session
+    """
+    subscriber = User.find_by_identity("subscriber@localhost")
+
+    if subscriber:
+        subscriber.delete()
+
+    db.session.query(Subscription).delete()
+
+    params = {
+        "role": "admin",
+        "email": "subscriber@localhost",
+        "name": "test_user",
+        "password": "password",
+        "payment_id": "customer_000"
+    }
+
+    subscriber = User(**params)
+
+    db.session.add(subscriber)
+    db.session.commit()
+
+    params = {
+        "user_id": subscriber.id,
+        "plan": "gold"
+    }
+
+    subscription = Subscription(**params)
+    db.session.add(subscription)
+
+    params = {
+        "user_id": subscriber.id,
+        "brand": "Visa",
+        "last4": "4242",
+        "exp_date": date(2021, 6, 1)
+    }
+    credit_card = CreditCard(**params)
+    db.session.add(credit_card)
+
+    db.session.commit()
+
+    return db
+
+
+@pytest.fixture(scope="session")
+def mock_stripe():
+    """
+    Mock all of the Stripe API calls.
+    """
+    upcoming_invoice_api = {
+        "date": 1433018770,
+        "id": "in_000",
+        "period_start": 1433018770,
+        "period_end": 1433018770,
+        "lines": {
+            "data": [
+                {
+                    "id": "sub_000",
+                    "object": "line_item",
+                    "type": "subscription",
+                    "livemode": True,
+                    "amount": 0,
+                    "currency": "usd",
+                    "proration": False,
+                    "period": {
+                        "start": 1433161742,
+                        "end": 1434371342
+                    },
+                    "subscription": None,
+                    "quantity": 1,
+                    "plan": {
+                        "interval": "month",
+                        "name": "Gold",
+                        "created": 1424879591,
+                        "amount": 500,
+                        "currency": "usd",
+                        "id": "gold",
+                        "object": "plan",
+                        "livemode": False,
+                        "interval_count": 1,
+                        "trial_period_days": 14,
+                        "metadata": {
+                        },
+                        "statement_descriptor": "GOLD MONTHLY"
+                    },
+                    "description": None,
+                    "discountable": True,
+                    "metadata": {
+                    }
+                }
+            ],
+            "total_count": 1,
+            "object": "list",
+            "url": "/v1/invoices/in_000/lines"
+        },
+        "subtotal": 0,
+        "total": 0,
+        "customer": "cus_000",
+        "object": "invoice",
+        "attempted": True,
+        "closed": True,
+        "forgiven": False,
+        "paid": True,
+        "livemode": False,
+        "attempt_count": 0,
+        "amount_due": 500,
+        "currency": "usd",
+        "starting_balance": 0,
+        "ending_balance": 0,
+        "next_payment_attempt": None,
+        "webhooks_delivered_at": None,
+        "charge": None,
+        "discount": None,
+        "application_fee": None,
+        "subscription": "sub_000",
+        "tax_percent": None,
+        "tax": None,
+        "metadata": {
+        },
+        "statement_descriptor": None,
+        "description": None,
+        "receipt_number": None
+    }
+    PaymentCoupon.create = Mock(return_value={})
+    PaymentCoupon.delete = Mock(return_value={})
+    PaymentEvent.retrieve = Mock(return_value={})
+    PaymentCard.update = Mock(return_value={})
+    PaymentSubscription.create = Mock(return_value={})
+    PaymentSubscription.update = Mock(return_value={})
+    PaymentSubscription.cancel = Mock(return_value={})
+    PaymentInvoice.upcoming = Mock(return_value=upcoming_invoice_api)

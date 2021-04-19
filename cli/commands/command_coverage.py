@@ -1,4 +1,4 @@
-import subprocess
+from subprocess import call
 
 from click import argument
 from click import command
@@ -14,5 +14,5 @@ def cli(path):
 
     :return: Subprocess call result
     """
-    shell_command = f"pytest --cov-branch --cov /snake_eyes/snake_eyes --cov-report term-missing {path}"  # noqa: E501
-    return subprocess.call(shell_command, shell=True)
+    shell_command = f"pytest --cov-branch --cov-report term-missing --cov {path}"  # noqa: E501
+    return call(shell_command, shell=True)

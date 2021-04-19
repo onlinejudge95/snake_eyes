@@ -1,7 +1,6 @@
 __pycache__/
 .git/
 .pytest_cache/
-.vscode/
 *.egg-info/
 
 bin/orchestrate.sh
@@ -9,3 +8,4 @@ bin/orchestrate.sh
 *.yml
 Dockerfile
 *.md
+celerybeat-schedule

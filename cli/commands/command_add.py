@@ -1,4 +1,6 @@
 from datetime import datetime
+from random import choice
+from random import randint
 from random import random
 
 from click import command
@@ -8,8 +10,9 @@ from click import pass_context
 from faker import Faker
 
 from snake_eyes.app import create_app
-from snake_eyes.extensions import db
+from snake_eyes.blueprints.billing.models.invoice import Invoice
 from snake_eyes.blueprints.user.models import User
+from snake_eyes.extensions import db
 
 
 app = create_app()
@@ -67,7 +70,6 @@ def users():
 
     random_emails = [faker.email() for i in range(99)]
     random_emails.append(app.config["SEED_ADMIN_EMAIL"])
-
     random_emails = list(set(random_emails))
 
     while True:
@@ -120,6 +122,68 @@ def users():
 
 
 @command()
+def invoices():
+    """
+    Generate fake invoices
+    """
+    data = []
+    users = db.session.query(User).all()
+
+    for user in users:
+        for i in range(randint(1, 12)):
+            created_on = faker \
+                .date_time_between(start_date="-1y", end_date="now") \
+                .strftime("%s")
+            period_start_on = faker \
+                .date_time_between(start_date="now", end_date="+1y") \
+                .strftime("%s")
+            period_end_on = faker \
+                .date_time_between(
+                    start_date=period_start_on, end_date="+14d"
+                ) \
+                .strftime("%s")
+            exp_date = faker \
+                .date_time_between(start_date="now", end_date="+2y") \
+                .strftime("%s")
+
+            created_on = datetime \
+                .utcfromtimestamp(float(created_on)) \
+                .strftime("%Y-%m-%dT%H:%M:%S Z")
+            period_start_on = datetime \
+                .utcfromtimestamp(float(period_start_on)) \
+                .strftime("%Y-%m-%d")
+            period_end_on = datetime \
+                .utcfromtimestamp(float(period_end_on)) \
+                .strftime("%Y-%m-%d")
+            exp_date = datetime \
+                .utcfromtimestamp(float(exp_date)) \
+                .strftime("%Y-%m-%d")
+
+            plans = ["BRONZE", "GOLD", "PLATINUM"]
+            cards = ["Visa", "Mastercard", "AMEX", "J.C.B", "Diner's Club"]
+
+            params = {
+                "created_on": created_on,
+                "updated_on": created_on,
+                "user_id": user.id,
+                "receipt_number": faker.md5(),
+                "description": f"{choice(plans)} MONTHLY",
+                "period_start_on": period_start_on,
+                "period_end_on": period_end_on,
+                "currency": "usd",
+                "tax": random() * 100,
+                "tax_percent": random() * 10,
+                "total": random() * 1000,
+                "brand": choice(cards),
+                "last4": randint(1000, 9000),
+                "exp_date": exp_date
+            }
+            data.append(params)
+
+    return _bulk_insert(Invoice, data, "invoices")
+
+
+@command()
 @pass_context
 def all(context):
     """
@@ -127,7 +191,9 @@ def all(context):
     :param context:
     """
     context.invoke(users)
+    context.invoke(invoices)
 
 
 cli.add_command(users)
+cli.add_command(invoices)
 cli.add_command(all)

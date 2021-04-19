@@ -2,6 +2,7 @@ from logging.handlers import SMTPHandler
 from logging import ERROR
 from logging import Formatter
 
+import stripe
 from celery import Celery
 from flask import Flask
 from flask import render_template
@@ -9,6 +10,10 @@ from itsdangerous import URLSafeTimedSerializer
 from werkzeug.contrib.fixers import ProxyFix
 
 from snake_eyes.blueprints.admin import admin_bp
+from snake_eyes.blueprints.billing import billing_bp
+from snake_eyes.blueprints.billing import stripe_webhook_bp
+from snake_eyes.blueprints.billing.template_processors import current_year
+from snake_eyes.blueprints.billing.template_processors import format_currency
 from snake_eyes.blueprints.page import page_bp
 from snake_eyes.blueprints.contact import contact_bp
 from snake_eyes.blueprints.user import user_bp
@@ -37,6 +42,9 @@ def create_app(settings_override=None):
 
     app.logger.setLevel(app.config["LOG_LEVEL"])
 
+    stripe.api_key = app.config.get("STRIPE_SECRET_KEY")
+    stripe.api_version = app.config.get("STRIPE_API_VERSION")
+
     middleware(app)
     error_handler(app)
     exception_handler(app)
@@ -45,7 +53,10 @@ def create_app(settings_override=None):
     app.register_blueprint(contact_bp)
     app.register_blueprint(user_bp)
     app.register_blueprint(admin_bp)
+    app.register_blueprint(billing_bp)
+    app.register_blueprint(stripe_webhook_bp)
 
+    template_processors(app)
     init_extensions(app)
     authentication(app, User)
 
@@ -177,3 +188,16 @@ def exception_handler(app):
         )
     )
     app.logger.addHandler(mail_handler)
+
+
+def template_processors(app):
+    """
+    Register custom template processors
+
+    :param app: Flask app instance
+    :return: App jinja environment
+    """
+    app.jinja_env.filters["format_currency"] = format_currency
+    app.jinja_env.globals.update(current_year=current_year)
+
+    return app.jinja_env

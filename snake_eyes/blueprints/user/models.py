@@ -12,6 +12,9 @@ from werkzeug.security import check_password_hash
 from werkzeug.security import generate_password_hash
 
 from lib.src.util_sqlalchemy import AwareDateTime, ResourceMixin
+from snake_eyes.blueprints.billing.models.credit_card import CreditCard
+from snake_eyes.blueprints.billing.models.invoice import Invoice
+from snake_eyes.blueprints.billing.models.subscription import Subscription
 from snake_eyes.extensions import db
 
 
@@ -24,6 +27,17 @@ class User(UserMixin, ResourceMixin, db.Model):
     ])
 
     id = db.Column(db.Integer, primary_key=True)
+
+    # Relationships with billing related tables
+    credit_card = db.relationship(
+        CreditCard, uselist=False, backref="users", passive_deletes=True
+    )
+    subscription = db.relationship(
+        Subscription, uselist=False, backref="users", passive_deletes=True
+    )
+    invoices = db.relationship(
+        Invoice, uselist=False, backref="users", passive_deletes=True
+    )
 
     # Attributes for authetication
     role = db.Column(
@@ -47,6 +61,11 @@ class User(UserMixin, ResourceMixin, db.Model):
         server_default=""
     )
     password = db.Column(db.String(128), nullable=False, server_default="")
+
+    # Attributes related to Billing
+    name = db.Column(db.String(128), index=True)
+    payment_id = db.Column(db.String(128), index=True)
+    cancelled_subscription_on = db.Column(AwareDateTime())
 
     # Attributes for activity tracking
     sign_in_count = db.Column(db.Integer, nullable=False, default=0)
@@ -162,6 +181,38 @@ class User(UserMixin, ResourceMixin, db.Model):
                 return True
 
         return False
+
+    @classmethod
+    def bulk_delete(cls, ids):
+        """
+        Override the general bulk delete method.
+        Users need to be deleted one at a time
+        from our db and also from stripe
+
+        :param ids: List of ids to be deleted
+        :type ids: list
+        :return: int
+        """
+        delete_count = 0
+
+        for _id in ids:
+            user = User.query.get(_id)
+
+            if user is None:
+                continue
+
+            if user.payment_id is None:
+                user.delete()
+            else:
+                subscription = Subscription()
+                cancelled = subscription.cancel(user=user)
+
+                if cancelled:
+                    user.delete()
+
+            delete_count += 1
+
+        return delete_count
 
     def is_active(self):
         """

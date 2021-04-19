@@ -24,4 +24,4 @@ def cli():
 
     for key in sorted(output):
         if "debugtoolbar" not in key and "debug_toolbar" not in key:
-            echo("{0: >{1}}: {2}".format(key, endpoint_padding, output[key]))
+            echo(f"{key : >{endpoint_padding}}: {output[key]}")

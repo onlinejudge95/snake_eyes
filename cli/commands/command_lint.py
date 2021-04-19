@@ -1,4 +1,4 @@
-import subprocess
+from subprocess import call
 
 from click import argument
 from click import command
@@ -23,5 +23,5 @@ def cli(skip_init, path):
     :return: Subprocess call result
     """
     flag = ",__init__.py" if skip_init else ""
-    shell_command = f"flake8 --exclude instance*,env{flag} {path}"
-    return subprocess.call(shell_command, shell=True)
+    shell_command = f"flake8 --exclude instance*{flag} {path}"
+    return call(shell_command, shell=True)

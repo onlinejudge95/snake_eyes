@@ -1,57 +1,33 @@
-version: "3.8"
+version: "2"
 
-networks:
-  snake_eyes:
-    driver: bridge
-    name: snake_eyes
+
+volumes:
+  postgres-data:
+  redis-data:
+
 
 services:
   postgres:
-    image: postgres:9.5
-    networks:
-      - snake_eyes
+    image: "postgres:9.5"
     ports:
-      - 5432:5432
+      - "5432:5432"
     volumes:
       - "postgres-data:/var/lib/postgresql/data"
     environment:
-      POSTGRES_DB: snake_eyes
-      POSTGRES_USER: snake_eyes
-      POSTGRES_PASSWORD: devpassword
-
-  celery:
-    command: "celery worker --app snake_eyes.blueprints.contact.tasks --loglevel info"
-    depends_on:
-      - postgres
-      - redis
-    networks:
-      - snake_eyes
-    volumes:
-      - ".:/snake_eyes"
-      - "./instance:/snake_eyes/instance"
-    build:
-      context: "."
-      dockerfile: "Dockerfile"
-    environment:
-      PYTHONUNBUFFERED: "true"
+      POSTGRES_USER: "snake_eyes"
+      POSTGRES_PASSWORD: "devpassword"
 
   redis:
     command: "redis-server --requirepass devpassword"
     image: "redis:3.0-alpine"
-    networks:
-      - snake_eyes
     ports:
       - "6379:6379"
     volumes:
       - "redis-data:/var/lib/redis/data"
 
-  snake_eyes:
+  website:
+    image: "website"
     command: "gunicorn --config 'python:config.gunicorn' --reload snake_eyes.app:create_app()"
-    depends_on:
-      - postgres
-      - redis
-    networks:
-      - snake_eyes
     volumes:
       - ".:/snake_eyes"
       - "./instance:/snake_eyes/instance"
@@ -63,16 +39,14 @@ services:
     environment:
       PYTHONUNBUFFERED: "true"
 
-  # visualizer:
-  #   image: dockersamples/visualizer
-  #   networks:
-  #     - snake_eyes
-  #   ports:
-  #     - 8080:8080
-  #   volumes:
-  #     - /var/run/docker.sock:/var/run/docker.sock
-
-
-volumes:
-  postgres-data:
-  redis-data:
+  celery:
+    image: "celery"
+    command: "celery worker --beat --app snake_eyes.blueprints.contact.tasks --loglevel info"
+    volumes:
+      - ".:/snake_eyes"
+      - "./instance:/snake_eyes/instance"
+    build:
+      context: "."
+      dockerfile: "Dockerfile"
+    environment:
+      PYTHONUNBUFFERED: "true"

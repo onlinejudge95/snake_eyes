@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 
 from sqlalchemy import DateTime
 from sqlalchemy.types import TypeDecorator
@@ -11,11 +11,10 @@ class AwareDateTime(TypeDecorator):
     """
     Time zone aware utility for storing date time objects
     """
-
     impl = DateTime(timezone=True)
 
     def process_bind_param(self, value, dialect):
-        if isinstance(value, datetime.datetime) and value.tzinfo is None:
+        if isinstance(value, datetime) and value.tzinfo is None:
             raise ValueError(f"{value} must be time zone aware")
         return value
 
@@ -67,12 +66,14 @@ class ResourceMixin:
         omit_ids = list(map(str, omit_ids))
 
         if scope == "all_search_results":
-            ids = cls.query.with_entities(cls.id).filter(cls.search(query))
-
-            ids = [str(item[0]) for item in ids]
+            ids = [
+                str(item[0])
+                for item in cls.query.with_entities(cls.id)
+                .filter(cls.search(query))
+            ]
 
         if omit_ids:
-            ids = [id for id in ids if id not in omit_ids]
+            ids = [_id for _id in ids if _id not in omit_ids]
 
         return ids
 
@@ -103,10 +104,10 @@ class ResourceMixin:
 
     def delete(self):
         """
-        Delete a model instance to db
+        Delete a model instance in db
         """
         db.session.delete(self)
-        db.session.commit()
+        return db.session.commit()
 
     def __str__(self):
         """

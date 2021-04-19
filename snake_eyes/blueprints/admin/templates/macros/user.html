@@ -2,6 +2,10 @@
   {% if user.role == 'admin' %}
     <i class="fa fa-3x fa-fw fa-shield" title="Admin"></i>
   {% else %}
-    <i class="fa fa-3x fa-fw fa-user text-muted" title="Member"></i>
+    {% if user.subscription %}
+      <i class="fa fa-3x fa-fw fa-star text-success" title="Paid member"></i>
+    {% else %}
+      <i class="fa fa-3x fa-fw fa-user text-muted" title="Member"></i>
+    {% endif %}
   {% endif %}
 {% endmacro %}

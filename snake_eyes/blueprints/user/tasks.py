@@ -18,7 +18,7 @@ def deliever_password_reset_mail(user_id, reset_token):
     """
     user = User.query.get(user_id)
 
-    if user:
+    if user is not None:
         context = {"user": user, "reset_token": reset_token}
 
         send_templated_message(
