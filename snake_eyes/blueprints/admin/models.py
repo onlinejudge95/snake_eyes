@@ -1,6 +1,7 @@
 from sqlalchemy import func
 
 from snake_eyes.blueprints.billing.models.subscription import Subscription
+from snake_eyes.blueprints.bet.models.bet import Bet
 from snake_eyes.blueprints.user.models import User
 from snake_eyes.blueprints.user.models import db
 
@@ -53,3 +54,12 @@ class Dashboard:
             if total == 0 else round((count / float(total)) * 100, 1)
 
         return count, total, percentage
+
+    @classmethod
+    def group_and_count_payouts(cls):
+        """
+        Performa  group by/count on all payouts.
+
+        :return: dict
+        """
+        return Dashboard._group_and_count(Bet, Bet.payout)

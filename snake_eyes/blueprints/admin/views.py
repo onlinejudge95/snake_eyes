@@ -43,6 +43,7 @@ def before_request():
 @bp.route("")
 def dashboard():
     group_and_count_coupons = Dashboard.group_and_count_coupons()
+    group_and_count_payouts = Dashboard.group_and_count_payouts()
     group_and_count_plans = Dashboard.group_and_count_plans()
     group_and_count_users = Dashboard.group_and_count_users()
     return render_template(
@@ -50,6 +51,7 @@ def dashboard():
         group_and_count_coupons=group_and_count_coupons,
         group_and_count_plans=group_and_count_plans,
         group_and_count_users=group_and_count_users,
+        group_and_count_payouts=group_and_count_payouts
     )
 
 
@@ -138,6 +140,7 @@ def users_edit(id):
 
         flash("User has been saved successfully", "success")
         return redirect(url_for("admin.users"))
+    print(form)
     return render_template(
         "admin/user/edit.html", form=form, user=user, invoices=invoices,
         upcoming=upcoming, coupon=coupon

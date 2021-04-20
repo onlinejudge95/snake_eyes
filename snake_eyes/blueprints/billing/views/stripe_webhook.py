@@ -4,6 +4,7 @@ from stripe.error import InvalidRequestError
 
 from lib.src.util_json import render_json
 from snake_eyes.blueprints.billing.gateways.stripecom import Event as PaymentEvent  # noqa: E501
+from snake_eyes.blueprints.billing.models.subscription import Subscription
 from snake_eyes.blueprints.billing.models.invoice import Invoice
 from snake_eyes.extensions import csrf
 
@@ -29,7 +30,11 @@ def event():
         safe_event = PaymentEvent.retrieve(request.json.get("id"))
         parsed_event = Invoice.parse_from_event(safe_event)
 
-        Invoice.prepare_and_save(parsed_event)
+        user = Invoice.prepare_and_save(parsed_event)
+
+        if parsed_event.get("total") > 0:
+            plan = Subscription.get_plan_by_id(user.subscription.plan)
+            user.add_coins(plan)
     except InvalidRequestError as e:
         return render_json(422, {"error": str(e)})
     except Exception as e:

@@ -10,6 +10,8 @@ from click import pass_context
 from faker import Faker
 
 from snake_eyes.app import create_app
+from snake_eyes.blueprints.bet.models.bet import Bet
+from snake_eyes.blueprints.bet.models.dice import roll
 from snake_eyes.blueprints.billing.models.invoice import Invoice
 from snake_eyes.blueprints.user.models import User
 from snake_eyes.extensions import db
@@ -93,6 +95,7 @@ def users():
         random_trail = str(int(round((random() * 1000))))
         first_name = faker.first_name()
         username = f"{first_name}{random_trail}" if random() >= 0.05 else None
+        last_bet_on = created_on if random() >=0.5 else None
 
         email = random_emails.pop()
 
@@ -104,6 +107,8 @@ def users():
             "username": username,
             "password": User.encrypt_password("password"),
             "sign_in_count": random() * 100,
+            "coins": 100,
+            "last_bet_on": last_bet_on,
             "current_sign_in_on": current_sign_in_on,
             "current_sign_in_ip": faker.ipv4(),
             "last_sign_in_on": current_sign_in_on,
@@ -184,6 +189,52 @@ def invoices():
 
 
 @command()
+def bets():
+    """
+    Generate random bets.
+    """
+    data = []
+    users = db.session.query(User).all()
+
+    for user in users:
+        for i in range(randint(10, 20)):
+            fake_datetime = faker \
+                .date_time_between(start_date="-1y", end_date="now") \
+                .strftime("%s")
+            created_on = datetime \
+                .utcfromtimestamp(float(fake_datetime)) \
+                .strftime("%Y-%m-%dT%H:%M:%S Z")
+
+            wagered = randint(1, 100)
+            dice_1, dice_2 = roll(), roll()
+            outcome = dice_1 + dice_2
+
+            guess = outcome if random() >= 0.75 else randint(2, 12)
+
+            is_winner = Bet.is_winner(guess, outcome)
+            payout = Bet.determine_payout(
+                float(app.config["DICE_ROLL_PAYOUT"][str(guess)]),
+                is_winner
+            )
+            net = Bet.calculate_net(wagered, payout, is_winner)
+
+            data.append({
+                "created_on": created_on,
+                "updated_on": created_on,
+                "user_id": user.id,
+                "guess": guess,
+                "dice_1": dice_1,
+                "dice_2": dice_2,
+                "roll": outcome,
+                "wagered": wagered,
+                "payout": payout,
+                "net": net
+            })
+
+    return _bulk_insert(Bet, data, "bets")
+
+
+@command()
 @pass_context
 def all(context):
     """
@@ -192,8 +243,10 @@ def all(context):
     """
     context.invoke(users)
     context.invoke(invoices)
+    context.invoke(bets)
 
 
 cli.add_command(users)
 cli.add_command(invoices)
+cli.add_command(bets)
 cli.add_command(all)

@@ -25,6 +25,19 @@
           </a>
         {% endif %}
       </div>
+
+      <h2>Betting</h2>
+      <div class="list-group">
+        <a href="{{ url_for('bet.history') }}" class="list-group-item">
+          Betting history
+        </a>
+        <span class="list-group-item quarter-faded text-warning">
+          You have
+          <strong>{{ current_user.coins }}</strong> coins
+        </span>
+      </div>
+      <a href="#coming-soon"
+         class="btn btn-primary">Buy more coins</a>
     </div>
     <div class="col-md-5 col-md-push-1 col-md-offset-1">
       {% if current_user.subscription %}

@@ -33,6 +33,12 @@
 
         <div class="alert alert-small alert-danger payment-errors"></div>
 
+        <noscript>
+          <p class="alert alert-sm alert-warning text-center sm-margin-top">
+            You need to enable JavaScript to proceed.
+          </p>
+        </noscript>
+
         {% if is_create %}
             <div class="coupon-code">
               {{ form.coupon_code.label }}

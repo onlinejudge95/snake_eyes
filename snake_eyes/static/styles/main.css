@@ -185,3 +185,9 @@ dd {
 a.pricing--primary {
   color: #fff;
 }
+
+/* Bet
+-------------------------------------------------- */
+#dice {
+  font-size: 100px;
+}
