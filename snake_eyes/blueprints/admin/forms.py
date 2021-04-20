@@ -50,6 +50,10 @@ class UserForm(ModelForm):
             Regexp(r"^\w+$", message=error_message)
         ]
     )
+    coins = IntegerField(
+        "Coins",
+        [DataRequired(), NumberRange(min=1, max=2147483647)]
+    )
     role = SelectField(
         "Privileges",
         [DataRequired()],

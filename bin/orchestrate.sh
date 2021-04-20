@@ -4,7 +4,6 @@
 if [[ $# -lt 1 ]]; then
     echo "Usage: orchestrate.sh [COMMAND] {SERVICE}"
     echo "###############################"
-    echo "install : Install the package in local namespace"
     echo "build   : Build the images before starting the containers"
     echo "deploy  : Deploy all services"
     echo "restart : Restart a single service"
@@ -21,9 +20,6 @@ fi
 COMMAND=$1
 
 case $COMMAND in
-install)
-    pip install --editable .
-;;
 build)
     docker-compose build --compress --parallel
 ;;

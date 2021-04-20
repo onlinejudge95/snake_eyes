@@ -10,6 +10,7 @@ from itsdangerous import URLSafeTimedSerializer
 from werkzeug.contrib.fixers import ProxyFix
 
 from snake_eyes.blueprints.admin import admin_bp
+from snake_eyes.blueprints.bet import bet_bp
 from snake_eyes.blueprints.billing import billing_bp
 from snake_eyes.blueprints.billing import stripe_webhook_bp
 from snake_eyes.blueprints.billing.template_processors import current_year
@@ -23,6 +24,7 @@ from snake_eyes.extensions import debug_toolbar
 from snake_eyes.extensions import login_manager
 from snake_eyes.extensions import mail
 from snake_eyes.extensions import csrf
+from snake_eyes.extensions import limiter
 
 
 def create_app(settings_override=None):
@@ -55,6 +57,7 @@ def create_app(settings_override=None):
     app.register_blueprint(admin_bp)
     app.register_blueprint(billing_bp)
     app.register_blueprint(stripe_webhook_bp)
+    app.register_blueprint(bet_bp)
 
     template_processors(app)
     init_extensions(app)
@@ -105,6 +108,7 @@ def init_extensions(app):
     login_manager.init_app(app)
     mail.init_app(app)
     csrf.init_app(app)
+    limiter.init_app(app)
 
 
 def authentication(app, user_model):
@@ -156,7 +160,7 @@ def error_handler(app):
         status_code = getattr(status, "code", 500)
         return render_template(f"errors/{status_code}.html"), status_code
 
-    for error in [404, 500]:
+    for error in [404, 429, 500]:
         app.errorhandler(error)(render_status)
 
 

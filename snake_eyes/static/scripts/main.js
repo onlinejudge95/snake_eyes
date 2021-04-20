@@ -184,8 +184,8 @@ var stripe = function () {
   };
 
   var protectAgainstInvalidCoupon = function (coupon, couponStatus) {
-    if (couponStatus.is(':visible')
-        && !couponStatus.hasClass('alert-success')) {
+    if (couponStatus.is(':visible') && 
+        !couponStatus.hasClass('alert-success')) {
       coupon.select();
       return false;
     }
@@ -248,7 +248,7 @@ var stripe = function () {
       $spinner.show();
     });
 
-    $('body').submit(function () {
+    $('body').on('submit', '#payment_form', function () {
       var $form = $(this);
       var $name = $('#name');
 
@@ -279,10 +279,104 @@ var stripe = function () {
   });
 };
 
+// Placing bets.
+var bets = function () {
+  var guessSelector = '#guess';
+  var wageredSelector = '#wagered';
+  var recentBetsSelector = '#recent_bets';
+  var $userCoins = $('#user_coins');
+  var $outcomeStatus = $('#outcome');
+  var $spinner = $('.spinner');
+  var $form = $('#place_bet');
+  
+  var placeBet = function (csrfToken) {
+    return $.ajax({
+      type: 'POST',
+      url: '/bet/place',
+      data: {guess: $(guessSelector).val(), wagered: $(wageredSelector).val()},
+      dataType: 'json',
+      beforeSend: function (xhr) {
+        xhr.setRequestHeader('X-CSRFToken', csrfToken);
+        return $outcomeStatus.text('')
+          .removeClass('alert-success alert-warning alert-error').hide();
+      }
+    }).done(function (data, status, xhr) {
+      var parsed_data = xhr.responseJSON.data;
+      var dice_entities = '';
+      var status_class = '';
+      var coinsLeft = parseInt($userCoins.text());
+
+      $userCoins.text(coinsLeft + parsed_data.net);
+
+      if (parsed_data.is_winner) {
+        status_class = '<i class="fa fa-fw fa-smile-o"></i> Congrats, you won!';
+        bet_class = 'success';
+      } else {
+        status_class = '<i class="fa fa-fw fa-frown-o"></i> You lost, try again!';
+        bet_class = 'danger';
+      }
+
+      dice_entities += "&#x268" + (parseInt(parsed_data.die_1) - 1) + "; ";
+      dice_entities += "&#x268" + (parseInt(parsed_data.die_2) - 1) + "; ";
+
+      $('#dice').html(dice_entities);
+      $(recentBetsSelector).show();
+
+      var guessCol = '<td>' + parsed_data.guess + '</td>';
+      var rollCol = '<td>' + parsed_data.roll + '</td>';
+      var wageredCol = '<td class="text-warning"><i class="fa fa-fw fa-database"></i> ' + parsed_data.wagered + '</td>';
+      var payoutCol = '<td>' + parseFloat(parsed_data.payout) + 'x</td>';
+      var netCol = '<td class="text-' + bet_class + '"><i class="fa fa-fw fa-database"></i> ' + parsed_data.net + '</td>';
+
+      var recentBet = '<tr>' + guessCol + rollCol + wageredCol + payoutCol + netCol + '</tr>';
+      var recentBetCount = $(recentBetsSelector + ' tr').length;
+
+      $(recentBetsSelector + ' tbody').prepend(recentBet);
+      if (recentBetCount > 10) {
+        $(recentBetsSelector + ' tr:last').remove();
+      }
+
+      return $outcomeStatus.addClass('alert alert-info alert-small').html(status_class);
+    }).fail(function (xhr, status, error) {
+      var status_class = 'alert-error';
+      var error_status = 'You are out of coins. You should buy more.';
+
+      if (xhr.responseJSON) {
+        error_status = xhr.responseJSON.error;
+      } else if (error == 'TOO MANY REQUESTS') {
+        error_status = 'You have been temporarily rate limited.';
+      }
+
+      return $outcomeStatus.addClass(status_class).text(error_status);
+    }).always(function (xhr, status, error) {
+      $spinner.hide();
+      $form.find('button').prop('disabled', false);
+
+      $outcomeStatus.show();
+      return xhr;
+    });
+  };
+
+  jQuery(function ($) {
+    var csrfToken = $('meta[name=csrf-token]').attr('content');
+
+    $('body').on('submit', '#place_bet', function () {
+      $spinner.show();
+      $form.find('button').prop('disabled', true);
+
+      placeBet(csrfToken);
+
+      return false;
+    });
+  });
+};
+
 // Initialize everything when the browser is ready.
 $(document).ready(function() {
   momentjsClasses();
   bulkDelete();
   coupons();
   stripe();
+  bets();
 });
+

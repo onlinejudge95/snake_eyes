@@ -12,6 +12,7 @@ from werkzeug.security import check_password_hash
 from werkzeug.security import generate_password_hash
 
 from lib.src.util_sqlalchemy import AwareDateTime, ResourceMixin
+from snake_eyes.blueprints.bet.models.bet import Bet
 from snake_eyes.blueprints.billing.models.credit_card import CreditCard
 from snake_eyes.blueprints.billing.models.invoice import Invoice
 from snake_eyes.blueprints.billing.models.subscription import Subscription
@@ -37,6 +38,9 @@ class User(UserMixin, ResourceMixin, db.Model):
     )
     invoices = db.relationship(
         Invoice, uselist=False, backref="users", passive_deletes=True
+    )
+    bets = db.relationship(
+        Bet, uselist=False, backref="bets", passive_deletes=True
     )
 
     # Attributes for authetication
@@ -66,6 +70,11 @@ class User(UserMixin, ResourceMixin, db.Model):
     name = db.Column(db.String(128), index=True)
     payment_id = db.Column(db.String(128), index=True)
     cancelled_subscription_on = db.Column(AwareDateTime())
+    previous_plan = db.Column(db.String(128))
+
+    # Attributes related to bet
+    coins = db.Column(db.BigInteger())
+    last_bet_on = db.Column(AwareDateTime())
 
     # Attributes for activity tracking
     sign_in_count = db.Column(db.Integer, nullable=False, default=0)
@@ -282,4 +291,15 @@ class User(UserMixin, ResourceMixin, db.Model):
         self.current_sign_in_ip = ip_address
         self.current_sign_in_on = datetime.now(utc)
 
+        return self.save()
+
+    def add_coins(self, plan):
+        """
+        Add an amount of coins to an existing user.
+
+        :param plan: Subscription plan
+        :type plan: str
+        :return: SQLAlchemy commit results
+        """
+        self.coins += plan["metadata"]["coins"]
         return self.save()

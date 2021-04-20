@@ -3,6 +3,7 @@ from pytz import utc
 
 from config import settings
 from lib.src.util_sqlalchemy import ResourceMixin
+from snake_eyes.blueprints.bet.models.coin import add_subscription_coins
 from snake_eyes.blueprints.billing.gateways.stripecom import Card as PaymentCard  # noqa: E501
 from snake_eyes.blueprints.billing.gateways.stripecom import Subscription as PaymentSubscription  # noqa: E501
 from snake_eyes.blueprints.billing.models.coupon import Coupon
@@ -86,6 +87,11 @@ class Subscription(ResourceMixin, db.Model):
 
         user.payment_id = customer.id
         user.name = name
+        user.previous_plan = plan
+        user.coins = add_subscription_coins(
+            user.coins, Subscription.get_plan_by_id(user.previous_plan),
+            Subscription.get_plan_by_id(plan), user.cancelled_subscription_on
+        )
         user.cancelled_subscription_on = None
 
         self.user_id = user.id
@@ -125,7 +131,12 @@ class Subscription(ResourceMixin, db.Model):
         """
         PaymentSubscription.update(user.payment_id, coupon, plan)
 
+        user.previous_plan = user.subscription.plan
         user.subscription.plan = plan
+        user.coins = add_subscription_coins(
+            user.coins, Subscription.get_plan_by_id(user.previous_plan),
+            Subscription.get_plan_by_id(plan), user.cancelled_subscription_on
+        )
 
         if coupon:
             user.subscription.coupon = coupon
