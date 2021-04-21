@@ -36,7 +36,7 @@
           <strong>{{ current_user.coins }}</strong> coins
         </span>
       </div>
-      <a href="#coming-soon"
+      <a href="{{ url_for('billing.purchase_coins') }}"
          class="btn btn-primary">Buy more coins</a>
     </div>
     <div class="col-md-5 col-md-push-1 col-md-offset-1">

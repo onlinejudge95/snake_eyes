@@ -8,7 +8,7 @@ from snake_eyes.extensions import db
 class CreditCard(ResourceMixin, db.Model):
     IS_EXPIRING_THRESHOLD_MONTHS = 2
 
-    _tablename__ = "credit_cards"
+    __tablename__ = "credit_cards"
 
     id = db.Column(db.Integer, primary_key=True)
 

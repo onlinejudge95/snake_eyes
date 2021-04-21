@@ -101,7 +101,7 @@ class Coupon(ResourceMixin, db.Model):
         return ""
 
     @classmethod
-    def expire_old_coupons(cls, compare_datetime=None):
+    def expire_old_coupons(cls, compare_datetime=datetime.now(utc)):
         """
         Invalidate expired coupons
 
@@ -109,9 +109,6 @@ class Coupon(ResourceMixin, db.Model):
         :type compare_datetime: date
         :return: SQLAlchemy commit object
         """
-        if compare_datetime is None:
-            compare_datetime = datetime.now(utc)
-
         Coupon \
             .query \
             .filter(Coupon.redeem_by <= compare_datetime) \
@@ -222,7 +219,22 @@ class Coupon(ResourceMixin, db.Model):
         if self.amount_off:
             params["amount_off"] = cents_to_dollars(self.amount_off)
 
-        if self.percentage_off:
-            params["percentage_off"] = self.percentage_off
+        if self.percent_off:
+            params["percent_off"] = self.percent_off
 
         return params
+
+    def apply_discount_to(self, amount):
+        """
+        Apply the discount to an amount.
+
+        :param amount: Amount in cents
+        :type amount: int
+        :return: int
+        """
+        if self.amount_off:
+            amount -= self.amount_off
+        elif self.percent_off:
+            amount *= (1 - (self.percent_off * 0.01))
+
+        return int(amount)

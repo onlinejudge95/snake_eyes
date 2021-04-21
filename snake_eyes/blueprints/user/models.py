@@ -36,12 +36,8 @@ class User(UserMixin, ResourceMixin, db.Model):
     subscription = db.relationship(
         Subscription, uselist=False, backref="users", passive_deletes=True
     )
-    invoices = db.relationship(
-        Invoice, uselist=False, backref="users", passive_deletes=True
-    )
-    bets = db.relationship(
-        Bet, uselist=False, backref="bets", passive_deletes=True
-    )
+    invoices = db.relationship(Invoice, backref="users", passive_deletes=True)
+    bets = db.relationship(Bet, backref="bets", passive_deletes=True)
 
     # Attributes for authetication
     role = db.Column(
@@ -87,6 +83,7 @@ class User(UserMixin, ResourceMixin, db.Model):
         super(User, self).__init__(**kwargs)
 
         self.password = User.encrypt_password(kwargs.get("password", ""))
+        self.coins = 100
 
     @classmethod
     def find_by_identity(cls, identity):
@@ -96,9 +93,10 @@ class User(UserMixin, ResourceMixin, db.Model):
         :type identity: str
         :return: User or None
         """
-        return User.query.filter(
-            (User.email == identity) | (User.username == identity)
-        ).first()
+        return User \
+            .query \
+            .filter((User.email == identity) | (User.username == identity)) \
+            .first()
 
     @classmethod
     def encrypt_password(cls, plaintext_password):

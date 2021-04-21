@@ -9,7 +9,7 @@ def count_loc(file_type, comment_pattern):
     Count LOC for a given file type excluding the comments
     """
     find_command = f"find . -name '*.{file_type}' -print0"
-    sed_command = f"sed '/^\s*{comment_pattern}/d;/^\s*$/d'"
+    sed_command = fr"sed '/^\s*{comment_pattern}/d;/^\s*$/d'"
     command = f"{find_command} | xargs -0 {sed_command} | wc -l"
     return check_output(command, shell=True).decode("utf-8").replace("\n", "")
 
@@ -23,8 +23,8 @@ def cli():
     file_types = (
         ["Python", "py", "#"],
         ["HTML", "html", "<!--"],
-        ["CSS", "css", "\/\*"],
-        ["JS", "js", "\/\/"],
+        ["CSS", "css", r"\/\*"],
+        ["JS", "js", r"\/\/"],
     )
 
     echo("Lines of code\n------------------")

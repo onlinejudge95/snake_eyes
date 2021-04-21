@@ -19,7 +19,7 @@ def format_currency(amount, convert_to_dollars=True):
     if convert_to_dollars:
         amount = cents_to_dollars(amount)
 
-    return "{:,.2f}".format(amount)
+    return f"{amount : ,.2f}"
 
 
 def current_year():

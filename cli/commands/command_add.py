@@ -95,7 +95,7 @@ def users():
         random_trail = str(int(round((random() * 1000))))
         first_name = faker.first_name()
         username = f"{first_name}{random_trail}" if random() >= 0.05 else None
-        last_bet_on = created_on if random() >=0.5 else None
+        last_bet_on = created_on if random() >= 0.5 else None
 
         email = random_emails.pop()
 
@@ -132,36 +132,37 @@ def invoices():
     Generate fake invoices
     """
     data = []
-    users = db.session.query(User).all()
 
-    for user in users:
+    for user in db.session.query(User).all():
         for i in range(randint(1, 12)):
-            created_on = faker \
+            fake_created_on = faker \
                 .date_time_between(start_date="-1y", end_date="now") \
                 .strftime("%s")
-            period_start_on = faker \
+            created_on = datetime \
+                .utcfromtimestamp(float(fake_created_on)) \
+                .strftime("%Y-%m-%dT%H:%M:%S Z")
+
+            fake_period_start_on = faker \
                 .date_time_between(start_date="now", end_date="+1y") \
                 .strftime("%s")
-            period_end_on = faker \
+            period_start_on = datetime \
+                .utcfromtimestamp(float(fake_period_start_on)) \
+                .strftime("%Y-%m-%d")
+
+            fake_period_end_on = faker \
                 .date_time_between(
                     start_date=period_start_on, end_date="+14d"
                 ) \
                 .strftime("%s")
-            exp_date = faker \
+            period_end_on = datetime \
+                .utcfromtimestamp(float(fake_period_end_on)) \
+                .strftime("%Y-%m-%d")
+
+            fake_exp_date = faker \
                 .date_time_between(start_date="now", end_date="+2y") \
                 .strftime("%s")
-
-            created_on = datetime \
-                .utcfromtimestamp(float(created_on)) \
-                .strftime("%Y-%m-%dT%H:%M:%S Z")
-            period_start_on = datetime \
-                .utcfromtimestamp(float(period_start_on)) \
-                .strftime("%Y-%m-%d")
-            period_end_on = datetime \
-                .utcfromtimestamp(float(period_end_on)) \
-                .strftime("%Y-%m-%d")
             exp_date = datetime \
-                .utcfromtimestamp(float(exp_date)) \
+                .utcfromtimestamp(float(fake_exp_date)) \
                 .strftime("%Y-%m-%d")
 
             plans = ["BRONZE", "GOLD", "PLATINUM"]
@@ -194,9 +195,8 @@ def bets():
     Generate random bets.
     """
     data = []
-    users = db.session.query(User).all()
 
-    for user in users:
+    for user in db.session.query(User).all():
         for i in range(randint(10, 20)):
             fake_datetime = faker \
                 .date_time_between(start_date="-1y", end_date="now") \

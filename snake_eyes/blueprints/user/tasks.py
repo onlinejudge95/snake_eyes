@@ -19,11 +19,9 @@ def deliever_password_reset_mail(user_id, reset_token):
     user = User.query.get(user_id)
 
     if user is not None:
-        context = {"user": user, "reset_token": reset_token}
-
         send_templated_message(
             subject="Password reset from snake eyes",
             recipients=[user.email],
             template="user/mail/password_reset",
-            context=context
+            context={"user": user, "reset_token": reset_token}
         )

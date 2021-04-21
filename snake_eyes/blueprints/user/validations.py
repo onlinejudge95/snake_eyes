@@ -21,6 +21,5 @@ def ensure_existing_password_matches(form, field):
     :param form: wtForms instance
     :param field: Field being passed in
     """
-    user = User.query.get(form._obj.id)
-    if not user.authenticated(password=field.data):
+    if not User.query.get(form._obj.id).authenticated(password=field.data):
         raise ValidationError("Does not matches")

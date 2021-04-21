@@ -6,9 +6,10 @@
 {% block body %}
   {{ billing.subscription_details(coupon) }}
   {{ billing.upcoming_invoice(upcoming) }}
-  {{ billing.invoices(invoices) }}
+  {{ billing.invoices(paginated_invoices) }}
 
-  <a href="{{ url_for('user.settings') }}" class="margin-top btn btn-primary">
+  <hr/>
+  <a href="{{ url_for('user.settings') }}" class="btn btn-primary">
     Go back to your account
   </a>
 {% endblock %}

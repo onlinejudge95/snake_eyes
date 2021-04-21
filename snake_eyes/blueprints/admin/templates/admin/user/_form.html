@@ -74,8 +74,7 @@
     {% endcall %}
   </div>
   <div class="col-md-5 col-md-push-1 col-md-offset-1">
-    <h3>Subscription details</h3>
-    {% include 'admin/user/_billing_details.html' with context %}
+    <h3>Billing details</h3>
     <div class="panel panel-default">
       <div class="panel-body">
         <dl>
@@ -86,9 +85,9 @@
                     data-datetime="{{ user.subscription.created_on }}">
                 {{ user.subscription.created_on }}
               </time>
-              (<a href="#billing_details"
-                data-toggle="modal"
-                data-target="#billing_details">View billing details</a>)
+              (<a href="{{ url_for('admin.invoices', q=user.email)}}">
+                View billing details
+              </a>)
             </dd>
             <dt>Plan</dt>
             <dd class="sm-margin-bottom">
@@ -124,13 +123,20 @@
                   {{ user.cancelled_subscription_on }}
                 </time>
               {% if user.invoices %}
-                (<a href="#billing_details"
-                  data-toggle="modal"
-                  data-target="#billing_details">View billing history</a>)
+                (<a href="{{ url_for('admin.invoices', q=user.email)}}">
+                  View billing details
+                </a>)
               {% endif %}
               </dd>
             {% else %}
-              <p>This user has never subscribed.</p>
+              <p>
+                This user has never subscribed.
+                {% if user.invoices %}
+                  (<a href="{{ url_for('admin.invoices', q=user.email)}}">
+                    View billing details
+                  </a>)
+                {% endif %}
+                </p>
             {% endif %}
           {% endif %}
         </dl>
