@@ -5,5 +5,5 @@ from wtforms.validators import NumberRange
 
 
 class BetForm(Form):
-	guess = IntegerField("Guess", [DataRequired(), NumberRange(min=2, max=12)])
-	wagered = IntegerField("Wagered", [DataRequired(), NumberRange(min=1)])
+    guess = IntegerField("Guess", [DataRequired(), NumberRange(min=2, max=12)])
+    wagered = IntegerField("Wagered", [DataRequired(), NumberRange(min=1)])

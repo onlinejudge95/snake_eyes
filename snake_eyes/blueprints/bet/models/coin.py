@@ -31,7 +31,8 @@ def add_subscription_coins(coins, previous_plan, plan, cancelled_on):
     # instead of adding subscription coins during the invoicing phase which
     # will mean that honest people who subscribe won't be able to get their
     # coins until after the free trial period.
-    previous_plan_coins = previous_plan["metadata"]["coins"] if previous_plan  else 0
+    previous_plan_coins = previous_plan["metadata"]["coins"] \
+        if previous_plan else 0
     plan_coins = plan["metadata"]["coins"]
 
     if cancelled_on is None and plan_coins == previous_plan_coins:

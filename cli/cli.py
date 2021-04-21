@@ -8,7 +8,6 @@ from click import command
 
 class SnakeEyesCLI(MultiCommand):
     COMMANDS_DIR = join_path(dirname(__file__), "commands")
-    COMMAND_PREFIX = "command_"
 
     def list_commands(self, ctx):
         """
@@ -20,7 +19,7 @@ class SnakeEyesCLI(MultiCommand):
         return sorted([
             fname[8:-3]
             for fname in listdir(self.COMMANDS_DIR)
-            if fname.endswith('.py') and fname.startswith(self.COMMAND_PREFIX)
+            if fname.endswith(".py") and fname.startswith("command_")
         ])
 
     def get_command(self, ctx, name):
@@ -34,7 +33,7 @@ class SnakeEyesCLI(MultiCommand):
         namespace = {}
         filename = join_path(
             self.COMMANDS_DIR,
-            f"{self.COMMAND_PREFIX}{name}.py"
+            f"command_{name}.py"
         )
 
         with open(filename, "r") as fp:

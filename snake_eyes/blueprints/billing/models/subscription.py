@@ -5,6 +5,7 @@ from config import settings
 from lib.src.util_sqlalchemy import ResourceMixin
 from snake_eyes.blueprints.bet.models.coin import add_subscription_coins
 from snake_eyes.blueprints.billing.gateways.stripecom import Card as PaymentCard  # noqa: E501
+from snake_eyes.blueprints.billing.gateways.stripecom import Customer as PaymentCustomer  # noqa: E501
 from snake_eyes.blueprints.billing.gateways.stripecom import Subscription as PaymentSubscription  # noqa: E501
 from snake_eyes.blueprints.billing.models.coupon import Coupon
 from snake_eyes.blueprints.billing.models.credit_card import CreditCard
@@ -81,7 +82,7 @@ class Subscription(ResourceMixin, db.Model):
         if coupon:
             self.coupon = coupon.upper()
 
-        customer = PaymentSubscription.create(
+        customer = PaymentCustomer.create(
             token=token, email=user.email, plan=plan, coupon=self.coupon
         )
 
@@ -167,6 +168,7 @@ class Subscription(ResourceMixin, db.Model):
 
         user.payment_id = None
         user.cancelled_subscription_on = datetime.now(utc)
+        user.previous_plan = user.subscription.plan
 
         db.session.add(user)
         db.session.delete(user.subscription)

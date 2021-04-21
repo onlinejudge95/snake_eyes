@@ -13,7 +13,8 @@ from lib.src.util_json import render_json
 from snake_eyes.blueprints.billing.decorators import handle_stripe_exceptions
 from snake_eyes.blueprints.billing.decorators import subscription_required
 from snake_eyes.blueprints.billing.forms import CancelSubscriptionForm
-from snake_eyes.blueprints.billing.forms import CreditCardForm
+from snake_eyes.blueprints.billing.forms import PaymentForm
+from snake_eyes.blueprints.billing.forms import SubscriptionForm
 from snake_eyes.blueprints.billing.forms import UpdateSubscriptionForm
 from snake_eyes.blueprints.billing.models.coupon import Coupon
 from snake_eyes.blueprints.billing.models.invoice import Invoice
@@ -71,7 +72,7 @@ def create():
         return redirect(url_for("billing.pricing"))
 
     stripe_key = current_app.config.get("STRIPE_PUBLISHABLE_KEY")
-    form = CreditCardForm(stripe_key=stripe_key, plan=plan)
+    form = SubscriptionForm(stripe_key=stripe_key, plan=plan)
 
     if form.validate_on_submit():
         subscription = Subscription()
@@ -166,7 +167,7 @@ def update_payment_method():
     active_plan = Subscription.get_plan_by_id(current_user.subscription.plan)
     card = current_user.credit_card
 
-    form = CreditCardForm(
+    form = SubscriptionForm(
         stripe_key=current_app.config.get("STRIPE_PUBLISHABLE_KEY"),
         plan=active_plan, name=current_user.name
     )
@@ -192,11 +193,16 @@ def update_payment_method():
     )
 
 
-@bp.route("/billing_details")
+@bp.route("/billing_details", defaults={"page": 1})
+@bp.route("/billing_details/page/<int:page>")
 @login_required
 @handle_stripe_exceptions
-def billing_details():
-    invoices = Invoice.billing_history(current_user)
+def billing_details(page):
+    paginated_invoices = Invoice \
+        .query \
+        .filter(Invoice.user_id == current_user.id) \
+        .order_by(Invoice.created_on.desc()) \
+        .paginate(page, 12, True)
 
     upcoming = Invoice.upcoming(current_user.payment_id) \
         if current_user.subscription else None
@@ -205,6 +211,50 @@ def billing_details():
         if current_user.subscription else None
 
     return render_template(
-        "billing/billing_details.html", invoices=invoices, upcoming=upcoming,
-        coupon=coupon
+        "billing/billing_details.html", paginated_invoices=paginated_invoices,
+        upcoming=upcoming, coupon=coupon
     )
+
+
+@bp.route("/purchase_coins", methods=["GET", "POST"])
+@login_required
+def purchase_coins():
+    form = PaymentForm(
+        stripe_key=current_app.config.get("STRIPE_PUBLISHABLE_KEY")
+    )
+
+    if form.validate_on_submit():
+        coin_bundles = current_app.config.get("COIN_BUNDLES")
+        coin_bundles_form = int(request.form.get("coin_bundles"))
+
+        bundle = next((
+            item
+            for item in coin_bundles
+            if item["coins"] == coin_bundles_form
+        ), None)
+
+        if bundle is not None:
+            invoice = Invoice()
+            created = invoice.create(
+                user=current_user,
+                currency=current_app.config.get("STRIPE_CURRENCY"),
+                amount=bundle.get("price_in_cents"),
+                coins=coin_bundles_form,
+                coupon=request.form.get("coupon_code"),
+                token=request.form.get("stripe_token")
+            )
+
+            if created:
+                flash(
+                    f"{coin_bundles_form} coins added to your account",
+                    "success"
+                )
+            else:
+                flash(
+                    "You must enable JavaScript for this request",
+                    "warning"
+                )
+
+            return redirect(url_for("bet.place_bet"))
+
+    return render_template("billing/purchase_coins.html", form=form)

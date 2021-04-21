@@ -12,7 +12,6 @@ from snake_eyes.extensions import csrf
 bp = Blueprint(
     "stripe_webhook",
     __name__,
-    template_folder="templates",
     url_prefix="/stripe_webhook"
 )
 

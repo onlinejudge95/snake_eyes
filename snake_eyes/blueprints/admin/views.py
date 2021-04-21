@@ -114,7 +114,7 @@ def users_edit(id):
     user = User.query.get(id)
     form = UserForm(obj=user)
 
-    invoices = Invoice.billing_history(current_user)
+    # invoices = Invoice.billing_history(current_user)
 
     upcoming = Invoice.upcoming(current_user.payment_id) \
         if current_user.subscription else None
@@ -238,3 +238,24 @@ def coupons_bulk_delete():
         flash("No coupons were deleted, something went wrong", "error")
 
     return redirect(url_for("admin.coupons"))
+
+
+@bp.route("/invoices", defaults={"page": 1})
+@bp.route("/invoices/page/<int:page>")
+def invoices(page):
+    search_form = SearchForm()
+    sort_by = Invoice.sort_by(
+        request.arge.get("sort", "created_on"),
+        request.arge.get("direction", "desc")
+    )
+    order_values = f"invoices.{sort_by[0]} {sort_by[1]}"
+    paginated_invoices = Invoice \
+        .query \
+        .filter(Invoice.search(request.args.get("q", ""))) \
+        .order_by(text(order_values)) \
+        .paginate(page, 50, True)
+
+    return render_template(
+        "admin/invoice/index.html",
+        form=search_form, invoices=paginated_invoices
+    )
