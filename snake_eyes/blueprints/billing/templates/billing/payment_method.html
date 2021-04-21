@@ -5,13 +5,13 @@
 {% set plan_name = request.args.get('plan', '') %}
 {% set is_create = request.endpoint.endswith('create') %}
 {% if is_create %}
-  {% set title = 'Enter payment information' %}
+  {% set title = _('Enter payment information') %}
   {% set endpoint = 'billing.create' %}
-  {% set button = 'Process payment' %}
+  {% set button = _('Process payment') %}
 {% else %}
-  {% set title = 'Update payment information' %}
+  {% set title = _('Update payment information') %}
   {% set endpoint = 'billing.update_payment_method' %}
-  {% set button = 'Update payment method' %}
+  {% set button = _('Update payment method') %}
 {% endif %}
 
 {% block title %}{{ title }}{% endblock %}
@@ -22,9 +22,9 @@
       {% call f.form_tag(endpoint, fid='subscription_form') %}
         <legend>
           {% if is_create %}
-            {{ plan_name | title }} subscription<br/>
+            {{ plan_name | title }} {{ _('subscription') }}<br/>
               <span class="small text-muted">
-                This plan costs 
+                {{ _('This plan costs') }}
                 ${{ plan.amount | format_currency }} / {{ plan.interval }}
               </span>
           {% else %}

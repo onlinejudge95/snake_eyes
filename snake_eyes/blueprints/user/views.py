@@ -16,6 +16,7 @@ from snake_eyes.blueprints.user.forms import LoginForm
 from snake_eyes.blueprints.user.forms import PasswordResetForm
 from snake_eyes.blueprints.user.forms import SignupForm
 from snake_eyes.blueprints.user.forms import UpdateCredentials
+from snake_eyes.blueprints.user.forms import UpdateLocaleForm
 from snake_eyes.blueprints.user.forms import WelcomeForm
 from snake_eyes.blueprints.user.models import User
 
@@ -157,3 +158,18 @@ def update_credentials():
         return redirect(url_for("user.settings"))
 
     return render_template("user/update_credentials.html", form=form)
+
+
+@bp.route("/settings/update_locale", methods=["GET", "POST"])
+@login_required
+def update_locale():
+    form = UpdateLocaleForm(locale=current_user.locale)
+
+    if form.validate_on_submit():
+        form.populate_obj(current_user)
+        current_user.save()
+
+        flash("Your locale settings have been updated", "success")
+        return redirect(url_for("user.settings"))
+
+    return render_template("user/update_locale.html", form=form)

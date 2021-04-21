@@ -6,6 +6,8 @@ import stripe
 from celery import Celery
 from flask import Flask
 from flask import render_template
+from flask import request
+from flask_login import current_user
 from itsdangerous import URLSafeTimedSerializer
 from werkzeug.contrib.fixers import ProxyFix
 
@@ -19,6 +21,7 @@ from snake_eyes.blueprints.page import page_bp
 from snake_eyes.blueprints.contact import contact_bp
 from snake_eyes.blueprints.user import user_bp
 from snake_eyes.blueprints.user.models import User
+from snake_eyes.extensions import babel
 from snake_eyes.extensions import db
 from snake_eyes.extensions import debug_toolbar
 from snake_eyes.extensions import login_manager
@@ -62,6 +65,7 @@ def create_app(settings_override=None):
     template_processors(app)
     init_extensions(app)
     authentication(app, User)
+    locale(app)
 
     return app
 
@@ -109,6 +113,7 @@ def init_extensions(app):
     mail.init_app(app)
     csrf.init_app(app)
     limiter.init_app(app)
+    babel.init_app(app)
 
 
 def authentication(app, user_model):
@@ -205,3 +210,20 @@ def template_processors(app):
     app.jinja_env.globals.update(current_year=current_year)
 
     return app.jinja_env
+
+
+def locale(app):
+    """
+    Initialize a locale for the current request.
+
+    :param app: Flask application instance
+    :return: str
+    """
+    @babel.localeselector
+    def get_locale():
+        if current_user.is_authenticated:
+            return current_user.locale
+
+        return request \
+            .accept_languages \
+            .best_match(app.config.get("LANGUAGES").keys())

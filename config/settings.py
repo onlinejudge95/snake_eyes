@@ -17,6 +17,12 @@ MAIL_USE_SSL = False
 MAIL_USERNAME = "user@gmail.com"
 MAIL_PASSWORD = "password"
 
+LANGUAGES = {
+    "en": "English",
+    "kl": "Klingon"
+}
+BABEL_DEFAULT_LOCALE = "en"
+
 CELERY_BROKER_URL = "redis://:devpassword@redis:6379/0"
 CELERY_RESULT_BACKEND = CELERY_BROKER_URL
 CELERY_ACCEPT_CONTENT = ["json"]

@@ -222,11 +222,13 @@
 
 
 {% macro payment_form(form, button_label, with_coupon) -%}
+  {% set button_label = _(button_label) %}
+
   <div class="alert alert-small alert-danger payment-errors"></div>
 
   <noscript>
     <p class="alert alert-sm alert-warning text-center sm-margin-top">
-      You need to enable JavaScript to proceed.
+      {{ _('You need to enable JavaScript to proceed.') }}
     </p>
   </noscript>
 
@@ -245,7 +247,7 @@
   {% endcall %}
 
   <div class="form-group">
-    <label for=""><strong>Card number</strong></label>
+    <label for=""><strong>{{ _('Card number') }}</strong></label>
     <input data-stripe="number" class="form-control"
            value="{{ '****' + card_last4 if card_last4 }}"/>
   </div>
@@ -253,7 +255,9 @@
   <div class="row">
     <div class="col-md-6">
       <div class="form-group pull-left form-inline">
-        <label for="" class="block"><strong>Exp. date</strong></label><br/>
+        <label for="" class="block">
+          <strong>{{ _('Exp. date') }}</strong>
+        </label><br/>
         <select data-stripe="exp-month" class="form-control cc-details">
           <option value=""></option>
           {% for month in range(1,13) %}
@@ -308,7 +312,9 @@
 
     <div class="text-success sm-margin-top">
       <i class="fa fa-fw fa-lock"></i>
-      <span class="small">Protected by 128-bit SSL encryption</span>
+      <span class="small">
+        {{ _('Protected by 128-bit SSL encryption') }}
+      </span>
     </div>
   </div>
 {%- endmacro %}

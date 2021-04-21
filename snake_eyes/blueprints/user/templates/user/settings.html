@@ -13,6 +13,10 @@
            class="list-group-item">
           Update email and password
         </a>
+        <a href="{{ url_for('user.update_locale') }}"
+           class="list-group-item">
+          Update language
+        </a>
         {% if current_user.username %}
           <span class="list-group-item quarter-faded text-muted">
             Your username is
