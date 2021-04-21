@@ -1,3 +1,4 @@
+from flask_babel import lazy_gettext as _
 from flask_wtf import Form
 from wtforms import HiddenField
 from wtforms import SelectField
@@ -23,20 +24,20 @@ def choices_from_coin_bundles():
 
 class SubscriptionForm(Form):
     stripe_key = HiddenField(
-        "Stripe Publishable Key", [DataRequired(), Length(1, 254)]
+        _("Stripe Publishable Key"), [DataRequired(), Length(1, 254)]
     )
-    plan = HiddenField("Plan", [DataRequired(), Length(1, 254)])
+    plan = HiddenField(_("Plan"), [DataRequired(), Length(1, 254)])
     coupon_code = StringField(
-        "Do you have a coupon code?", [Optional(), Length(1, 128)]
+        _("Do you have a coupon code?"), [Optional(), Length(1, 128)]
     )
     name = StringField(
-        "Name on card", [DataRequired(), Length(1, 254)]
+        _("Name on card"), [DataRequired(), Length(1, 254)]
     )
 
 
 class UpdateSubscriptionForm(Form):
     coupon_code = StringField(
-        "Do you have a coupon code?", [Optional(), Length(1, 128)]
+        _("Do you have a coupon code?"), [Optional(), Length(1, 128)]
     )
 
 
@@ -46,15 +47,15 @@ class CancelSubscriptionForm(Form):
 
 class PaymentForm(Form):
     stripe_key = HiddenField(
-        "Stripe Publishable Key", [DataRequired(), Length(1, 254)]
+        _("Stripe Publishable Key"), [DataRequired(), Length(1, 254)]
     )
     coin_bundles = SelectField(
-        "How many coins do you want?", [DataRequired()],
+        _("How many coins do you want?"), [DataRequired()],
         choices=choices_from_coin_bundles()
     )
     coupon_code = StringField(
-        "Do you have a coupon code?", [Optional(), Length(1, 128)]
+        _("Do you have a coupon code?"), [Optional(), Length(1, 128)]
     )
     name = StringField(
-        "Name on card", [DataRequired(), Length(1, 254)]
+        _("Name on card"), [DataRequired(), Length(1, 254)]
     )

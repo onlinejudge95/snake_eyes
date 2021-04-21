@@ -5,6 +5,7 @@ from flask import redirect
 from flask import render_template
 from flask import request
 from flask import url_for
+from flask_babel import gettext as _
 from flask_login import current_user
 from flask_login import login_required
 
@@ -61,14 +62,14 @@ def coupon_code():
 @handle_stripe_exceptions
 def create():
     if current_user.subscription:
-        flash("You already have an active subscriptions", "info")
+        flash(_("You already have an active subscriptions"), "info")
         return redirect(url_for("user.settings"))
 
     plan = request.args.get("plan")
     subscription_plan = Subscription.get_plan_by_id(plan)
 
     if subscription_plan is None and request.method == "GET":
-        flash("Sorry the plan does not exists", "error")
+        flash(_("Sorry the plan does not exists"), "error")
         return redirect(url_for("billing.pricing"))
 
     stripe_key = current_app.config.get("STRIPE_PUBLISHABLE_KEY")
@@ -84,9 +85,9 @@ def create():
         )
 
         if created:
-            flash("Awesome, thanks for subscribing", "success")
+            flash(_("Awesome, thanks for subscribing"), "success")
         else:
-            flash("You must enable Javascript for this", "warning")
+            flash(_("You must enable Javascript for this"), "warning")
 
         return redirect(url_for("user.settings"))
 
@@ -123,7 +124,7 @@ def update():
         )
 
         if updated:
-            flash("Your subscription has been updated", "success")
+            flash(_("Your subscription has been updated"), "success")
             return redirect(url_for("user.settings"))
 
     return render_template(
@@ -137,7 +138,7 @@ def update():
 @handle_stripe_exceptions
 def cancel():
     if not current_user.subscription:
-        flash("You do not have an active subscription", "error")
+        flash(_("You do not have an active subscription"), "error")
         return redirect(url_for("user.settings"))
 
     form = CancelSubscriptionForm()
@@ -148,7 +149,7 @@ def cancel():
 
         if cancelled:
             flash(
-                "Sorry to see you go, your subscription has been cancelled",
+                _("Sorry to see you go, your subscription has been cancelled"),
                 "success"
             )
             return redirect(url_for("user.settings"))
@@ -161,7 +162,7 @@ def cancel():
 @handle_stripe_exceptions
 def update_payment_method():
     if not current_user.credit_card:
-        flash("You do not have a payment method added", "error")
+        flash(_("You do not have a payment method added"), "error")
         return redirect(url_for("user.settings"))
 
     active_plan = Subscription.get_plan_by_id(current_user.subscription.plan)
@@ -181,9 +182,9 @@ def update_payment_method():
         )
 
         if updated:
-            flash("Your payment method has been updated", "success")
+            flash(_("Your payment method has been updated"), "success")
         else:
-            flash("You must enable JavaScript for this request", "warning")
+            flash(_("You must enable JavaScript for this request"), "warning")
 
         return redirect(url_for("user.settings"))
 
@@ -246,12 +247,12 @@ def purchase_coins():
 
             if created:
                 flash(
-                    f"{coin_bundles_form} coins added to your account",
+                    _("%(amount)s coins added to your account", amount=coin_bundles_form),   # noqa: E501
                     "success"
                 )
             else:
                 flash(
-                    "You must enable JavaScript for this request",
+                    _("You must enable JavaScript for this request"),
                     "warning"
                 )
 
