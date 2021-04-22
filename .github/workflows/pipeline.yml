@@ -10,7 +10,7 @@ env:
   BACKEND_IMAGE_NAME_GITHUB_REGISTRY: docker.pkg.github.com/onlinejudge95/snake_eyes/snake_eyes_backend
   WORKER_IMAGE_NAME_GITHUB_REGISTRY: docker.pkg.github.com/onlinejudge95/snake_eyes/snake_eyes_worker
   BACKEND_IMAGE_NAME_HEROKU_REGISTRY: registry.heroku.com/snake-eyes-backend/web
-  WORKER_IMAGE_NAME_HEROKU_REGISTRY: registry.heroku.com/snake_eyes_worker/web
+  WORKER_IMAGE_NAME_HEROKU_REGISTRY: registry.heroku.com/snake-eyes-worker/web
 
 jobs:
   build:
