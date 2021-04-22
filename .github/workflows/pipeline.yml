@@ -42,10 +42,10 @@ jobs:
 
       - name: "Tag and Push the Docker image for backend"
         run: |
-          docker image tag $BACKEND_IMAGE_NAME_HEROKU_REGISTRY:$GITHUB_SHA $BACKEND_IMAGE_NAME_HEROKU_REGISTRY:$GITHUB_SHA
+          docker image tag $BACKEND_IMAGE_NAME_GITHUB_REGISTRY:$GITHUB_SHA $BACKEND_IMAGE_NAME_HEROKU_REGISTRY:$GITHUB_SHA
           docker image push $BACKEND_IMAGE_NAME_HEROKU_REGISTRY:$GITHUB_SHA
 
       - name: "Tag Push the Docker image for worker"
         run: |
-          docker image tag $WORKER_IMAGE_NAME_HEROKU_REGISTRY:$GITHUB_SHA $WORKER_IMAGE_NAME_HEROKU_REGISTRY:$GITHUB_SHA
+          docker image tag $WORKER_IMAGE_NAME_GITHUB_REGISTRY:$GITHUB_SHA $WORKER_IMAGE_NAME_HEROKU_REGISTRY:$GITHUB_SHA
           docker image push $WORKER_IMAGE_NAME_HEROKU_REGISTRY:$GITHUB_SHA
