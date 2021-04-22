@@ -1,10 +1,12 @@
-name: "Pipeline"
+name: Pipeline
 
 on:
   push:
-    branches: [ "master" ]
+    branches:
+      - master
   pull_request:
-    branches: [ "master" ]
+    branches:
+      - master
 
 env:
   BACKEND_IMAGE_NAME_GITHUB_REGISTRY: docker.pkg.github.com/onlinejudge95/snake_eyes/snake_eyes_backend
@@ -14,44 +16,64 @@ env:
 
 jobs:
   build:
-    runs-on: "ubuntu-latest"
+    runs-on: ubuntu-latest
     steps:
-      - uses: "actions/checkout@v2"
+      - uses: actions/checkout@v2
 
-      - name: "Login the github docker container registry"
+      - name: Login the github docker container registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login --username ${{ github.actor }} --password-stdin docker.pkg.github.com
 
-      - name: "Build the Docker image for backend"
+      - name: Build the Docker image for backend
         run: |
           docker image build --file backend.Dockerfile --tag $BACKEND_IMAGE_NAME_GITHUB_REGISTRY:$GITHUB_SHA .
           docker image push $BACKEND_IMAGE_NAME_GITHUB_REGISTRY:$GITHUB_SHA
 
-      - name: "Build the Docker image for worker"
+      - name: Build the Docker image for worker"
         run: |
           docker image build --file worker.Dockerfile --tag $WORKER_IMAGE_NAME_GITHUB_REGISTRY:$GITHUB_SHA .
           docker image push $WORKER_IMAGE_NAME_GITHUB_REGISTRY:$GITHUB_SHA
 
   push:
     needs: build
-    runs-on: "ubuntu-latest"
+    runs-on: ubuntu-latest
     steps:
-      - uses: "actions/checkout@v2"
+      - uses: actions/checkout@v2
 
-      - name: "Pull the current docker image for backend and worker"
+      - name: Pull the current docker image for backend and worker
         run: |
           echo "${{ secrets.GITHUB_TOKEN }}" | docker login --username ${{ github.actor }} --password-stdin docker.pkg.github.com
           docker image pull $BACKEND_IMAGE_NAME_GITHUB_REGISTRY:$GITHUB_SHA
           docker image pull $WORKER_IMAGE_NAME_GITHUB_REGISTRY:$GITHUB_SHA
+          docker logout
 
-      - name: "Login the heroku docker registry"
+      - name: Login the heroku docker registry
         run: docker login --username _ --password ${{ secrets.HEROKU_AUTH_TOKEN }} registry.heroku.com
 
-      - name: "Tag and Push the Docker image for backend"
+      - name: Tag and Push the Docker image for backend
         run: |
-          docker image tag $BACKEND_IMAGE_NAME_GITHUB_REGISTRY:$GITHUB_SHA $BACKEND_IMAGE_NAME_HEROKU_REGISTRY:$GITHUB_SHA
-          docker image push $BACKEND_IMAGE_NAME_HEROKU_REGISTRY:$GITHUB_SHA
+          docker image tag $BACKEND_IMAGE_NAME_GITHUB_REGISTRY:$GITHUB_SHA $BACKEND_IMAGE_NAME_HEROKU_REGISTRY
+          docker image push $BACKEND_IMAGE_NAME_HEROKU_REGISTRY
 
-      - name: "Tag Push the Docker image for worker"
+      - name: Tag Push the Docker image for worker
         run: |
-          docker image tag $WORKER_IMAGE_NAME_GITHUB_REGISTRY:$GITHUB_SHA $WORKER_IMAGE_NAME_HEROKU_REGISTRY:$GITHUB_SHA
-          docker image push $WORKER_IMAGE_NAME_HEROKU_REGISTRY:$GITHUB_SHA
+          docker image tag $WORKER_IMAGE_NAME_GITHUB_REGISTRY:$GITHUB_SHA $WORKER_IMAGE_NAME_HEROKU_REGISTRY
+          docker image push $WORKER_IMAGE_NAME_HEROKU_REGISTRY
+
+  deploy:
+    needs: push
+    runs-on: ubuntu-latest
+    if: github.ref == "refs/heads/master" 
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Deploy backend container
+        run: |
+          BACKEND_IMAGE_ID=$(docker inspect ${BACKEND_IMAGE_NAME_HEROKU_REGISTRY} --format={{.Id}})
+          BACKEND_PAYLOAD='{"updates": [{"type": "web", "docker_image": "'"$BACKEND_IMAGE_ID"'"}]}'
+          curl --netrc --request PATCH https://api.heroku.com/apps/snake-eyes-backend/formation --data "${BACKEND_PAYLOAD}" --header "Content-Type: application/json" --header "Accept: application/vnd.heroku+json; version=3.docker-releases" --header "Authorization: Bearer ${HEROKU_AUTH_TOKEN}"
+
+      - name: Deploy worker container
+        run: |
+          WORKER_IMAGE_ID=$(docker inspect ${WORKER_IMAGE_NAME_HEROKU_REGISTRY} --format={{.Id}})
+          WORKER_PAYLOAD='{"updates": [{"type": "web", "docker_image": "'"$WORKER_IMAGE_ID"'"}]}'
+          curl --netrc --request PATCH https://api.heroku.com/apps/snake-eyes-backend/formation --data "${WORKER_PAYLOAD}" --header "Content-Type: application/json" --header "Accept: application/vnd.heroku+json; version=3.docker-releases" --header "Authorization: Bearer ${HEROKU_AUTH_TOKEN}"
