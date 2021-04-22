@@ -1,21 +1,22 @@
 from datetime import timedelta
+from os import environ
 
 from celery.schedules import crontab
 
 
-DEBUG = True
-LOG_LEVEL = "DEBUG"
+DEBUG = environ.get("DEBUG", False)
+LOG_LEVEL = environ.get("LOG_LEVEL", "DEBUG")
 
-SERVER_NAME = "localhost:8000"
-SECRET_KEY = "secret_key"
+SERVER_NAME = environ.get("SERVER_NAME", "localhost:8000")
+SECRET_KEY = environ.get("SECRET_KEY", "secret_key")
 
-MAIL_DEFAULT_SENDER = "contact@local.host"
-MAIL_SERVER = "smtp.gmail.com"
-MAIL_PORT = 587
-MAIL_USE_TLS = True
-MAIL_USE_SSL = False
-MAIL_USERNAME = "user@gmail.com"
-MAIL_PASSWORD = "password"
+MAIL_DEFAULT_SENDER = environ.get("MAIL_DEFAULT_SENDER", "contact@local.host")
+MAIL_SERVER = environ.get("MAIL_SERVER", "smtp.gmail.com")
+MAIL_PORT = environ.get("MAIL_SERVER", 587)
+MAIL_USE_TLS = environ.get("MAIL_USE_TLS", True)
+MAIL_USE_SSL = environ.get("MAIL_USE_SSL", False)
+MAIL_USERNAME = environ.get("MAIL_USERNAME", "user@gmail.com")
+MAIL_PASSWORD = environ.get("MAIL_PASSWORD", "password")
 
 LANGUAGES = {
     "en": "English",
@@ -23,7 +24,7 @@ LANGUAGES = {
 }
 BABEL_DEFAULT_LOCALE = "en"
 
-CELERY_BROKER_URL = "redis://:devpassword@redis:6379/0"
+CELERY_BROKER_URL = environ.get("REDIS_URL", "redis://:devpassword@redis:6379/0")
 CELERY_RESULT_BACKEND = CELERY_BROKER_URL
 CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TASK_SERIALIZER = "json"
@@ -45,17 +46,18 @@ CELERYBEAT_SCHEDULE = {
     },
 }
 
-SQLALCHEMY_DATABASE_URI = "postgresql://snake_eyes:devpassword@postgres:5432/snake_eyes"  # noqa: E501
+SQLALCHEMY_DATABASE_URI = environ.get("DATABASE_URL", "postgresql://snake_eyes:devpassword@postgres:5432/snake_eyes")  # noqa: E501
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-SEED_ADMIN_EMAIL = "dev@localhost"
-SEED_ADMIN_PASSWORD = "devpassword"
+SEED_ADMIN_EMAIL = environ.get("SEED_ADMIN_EMAIL", "dev@localhost")
+SEED_ADMIN_PASSWORD = environ.get("SEED_ADMIN_PASSWORD", "devpassword")
 REMEMBER_COOKIE_DURATION = timedelta(days=90)
 
-STRIPE_SECRET_KEY = None
-STRIPE_PUBLISHABLE_KEY = None
+ANALYTICS_GOOGLE_UA = environ.get("ANALYTICS_GOOGLE_UA")
+
+STRIPE_SECRET_KEY = environ.get("STRIPE_SECRET_KEY", "")
+STRIPE_PUBLISHABLE_KEY = environ.get("STRIPE_PUBLISHABLE_KEY", "")
 STRIPE_API_VERSION = "2016-03-07"
-# STRIPE_CURRENCY = "usd"
 STRIPE_CURRENCY = "inr"
 STRIPE_PLANS = {
     "0": {
@@ -101,10 +103,10 @@ STRIPE_PLANS = {
 }
 
 COIN_BUNDLES = [
-    {"coins": 100, "price_in_cents": 100, "label": "100 for $1"},
-    {"coins": 1000, "price_in_cents": 900, "label": "1,000 for $9"},
-    {"coins": 5000, "price_in_cents": 4000, "label": "5,000 for $40"},
-    {"coins": 10000, "price_in_cents": 7000, "label": "10,000 for $70"}
+    {"coins": 100, "price_in_cents": 100, "label": "100 for ₹1"},
+    {"coins": 1000, "price_in_cents": 900, "label": "1,000 for ₹9"},
+    {"coins": 5000, "price_in_cents": 4000, "label": "5,000 for ₹40"},
+    {"coins": 10000, "price_in_cents": 7000, "label": "10,000 for ₹70"}
 ]
 
 DICE_ROLL_PAYOUT = {
