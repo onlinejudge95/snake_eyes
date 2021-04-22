@@ -37,6 +37,12 @@ jobs:
     steps:
       - uses: "actions/checkout@v2"
 
+      - name: "Pull the current docker image for backend and worker"
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login --username ${{ github.actor }} --password-stdin docker.pkg.github.com
+          docker image pull $BACKEND_IMAGE_NAME_GITHUB_REGISTRY:$GITHUB_SHA
+          docker image pull $WORKER_IMAGE_NAME_GITHUB_REGISTRY:$GITHUB_SHA
+
       - name: "Login the heroku docker registry"
         run: docker login --username _ --password ${{ secrets.HEROKU_AUTH_TOKEN }} registry.heroku.com
 
