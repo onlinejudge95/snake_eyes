@@ -18,32 +18,20 @@ jobs:
     steps:
       - uses: "actions/checkout@v2"
 
-      - name: "Build the Docker image for backend"
-        run: docker image build --file backend.Dockerfile --tag backend:latest .
-
-      - name: "Build the Docker image for worker"
-        run: docker image build --file worker.Dockerfile --tag worker:latest .
-
-  push-github:
-    needs: build
-    runs-on: "ubuntu-latest"
-    steps:
-      - uses: "actions/checkout@v2"
-
       - name: "Login the github docker container registry"
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login --username ${{ github.actor }} --password-stdin docker.pkg.github.com
 
-      - name: "Tag and Push the Docker image for backend"
+      - name: "Build the Docker image for backend"
         run: |
-          docker image tag backend:latest $BACKEND_IMAGE_NAME_GITHUB_REGISTRY:$GITHUB_SHA
+          docker image build --file backend.Dockerfile --tag $BACKEND_IMAGE_NAME_GITHUB_REGISTRY:$GITHUB_SHA .
           docker image push $BACKEND_IMAGE_NAME_GITHUB_REGISTRY:$GITHUB_SHA
 
-      - name: "Tag and Push the Docker image for worker"
+      - name: "Build the Docker image for worker"
         run: |
-          docker image tag worker:latest $WORKER_IMAGE_NAME_GITHUB_REGISTRY:$GITHUB_SHA
+          docker image build --file worker.Dockerfile --tag $WORKER_IMAGE_NAME_GITHUB_REGISTRY:$GITHUB_SHA .
           docker image push $WORKER_IMAGE_NAME_GITHUB_REGISTRY:$GITHUB_SHA
 
-  push-heroku:
+  push:
     needs: build
     runs-on: "ubuntu-latest"
     steps:
