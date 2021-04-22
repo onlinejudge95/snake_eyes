@@ -7,7 +7,7 @@ on:
     branches: [ "master" ]
 
 env:
-  BACKEND_IMAGE_NAME: docker.pkg.github.com/onlinejudge95/snake_eyes_backend:$(date +%s)
+  BACKEND_IMAGE_NAME: docker.pkg.github.com/onlinejudge95/snake_eyes_backend
   # WORKER_IMAGE_NAME: docker.pkg.github.com/onlinejudge95/snake_eyes_worker:$(date +%s)
 
 jobs:
@@ -19,8 +19,9 @@ jobs:
     - name: "Login the docker registry"
       run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login --username ${{ github.actor }} --password-stdin docker.pkg.github.com
 
-    - name: "Build the Docker images"
-      run: docker image build --file Dockerfile --tag $BACKEND_IMAGE_NAME
+    - name: "Build and push the Docker image for backend"
+      run: |
+        VERSION=$(date +%s)
+        docker image build --file Dockerfile --tag $BACKEND_IMAGE_NAME:$VERSION
 
-    - name: "Push the images to the registry"
-      run: docker image push $BACKEND_IMAGE_NAME
+        docker image push $BACKEND_IMAGE_NAME:$VERSION
