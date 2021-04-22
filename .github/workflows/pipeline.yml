@@ -22,13 +22,13 @@ jobs:
     - name: "Build and push the Docker image for backend"
       run: |
         VERSION=$(date +%Y-%m-%d-%H-%M)
-        docker image build --file Dockerfile --tag $BACKEND_IMAGE_NAME:$VERSION .
+        docker image build --file backend.Dockerfile --tag $BACKEND_IMAGE_NAME:$VERSION .
 
         docker image push $BACKEND_IMAGE_NAME:$VERSION
 
     - name: "Build and push the Docker image for backend"
       run: |
         VERSION=$(date +%Y-%m-%d-%H-%M)
-        docker image build --file Dockerfile --tag $BACKEND_IMAGE_NAME:$VERSION .
+        docker image build --file worker.Dockerfile --tag $WORKER_IMAGE_NAME:$VERSION .
 
-        docker image push $BACKEND_IMAGE_NAME:$VERSION
+        docker image push $WORKER_IMAGE_NAME:$VERSION
