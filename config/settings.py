@@ -24,7 +24,7 @@ LANGUAGES = {
 }
 BABEL_DEFAULT_LOCALE = "en"
 
-CELERY_BROKER_URL = environ.get("REDIS_URL", "redis://:devpassword@redis:6379/0")
+CELERY_BROKER_URL = environ.get("REDIS_URL", "redis://:devpassword@redis:6379/0")  # noqa: E501
 CELERY_RESULT_BACKEND = CELERY_BROKER_URL
 CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TASK_SERIALIZER = "json"
