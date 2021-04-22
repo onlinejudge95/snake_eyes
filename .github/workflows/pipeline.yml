@@ -8,7 +8,7 @@ on:
 
 env:
   BACKEND_IMAGE_NAME: docker.pkg.github.com/onlinejudge95/snake_eyes/snake_eyes_backend
-  # WORKER_IMAGE_NAME: docker.pkg.github.com/onlinejudge95/snake_eyes_worker:$(date +%s)
+  # WORKER_IMAGE_NAME: docker.pkg.github.com/onlinejudge95/snake_eyes_worker
 
 jobs:
   build:
@@ -21,7 +21,7 @@ jobs:
 
     - name: "Build and push the Docker image for backend"
       run: |
-        VERSION=$(date +%s)
+        VERSION=$(date +%Y-%m-%d-%H-%M)
         docker image build --file Dockerfile --tag $BACKEND_IMAGE_NAME:$VERSION .
 
         docker image push $BACKEND_IMAGE_NAME:$VERSION

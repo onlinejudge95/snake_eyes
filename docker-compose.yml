@@ -35,7 +35,7 @@ services:
       - "8000:8000"
     build:
       context: "."
-      dockerfile: "Dockerfile"
+      dockerfile: "backend.Dockerfile"
     environment:
       PYTHONUNBUFFERED: "true"
 
