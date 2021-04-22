@@ -7,7 +7,7 @@ on:
     branches: [ "master" ]
 
 env:
-  BACKEND_IMAGE_NAME: docker.pkg.github.com/onlinejudge95/snake_eyes_backend
+  BACKEND_IMAGE_NAME: docker.pkg.github.com/onlinejudge95/snake_eyes/snake_eyes_backend
   # WORKER_IMAGE_NAME: docker.pkg.github.com/onlinejudge95/snake_eyes_worker:$(date +%s)
 
 jobs:
