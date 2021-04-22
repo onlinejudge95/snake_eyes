@@ -1,0 +1,57 @@
+name: "Pipeline"
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+env:
+  BACKEND_IMAGE_NAME_GITHUB_REGISTRY: docker.pkg.github.com/onlinejudge95/snake_eyes/snake_eyes_backend
+  WORKER_IMAGE_NAME_GITHUB_REGISTRY: docker.pkg.github.com/onlinejudge95/snake_eyes/snake_eyes_worker
+  BACKEND_IMAGE_NAME_HEROKU_REGISTRY: registry.heroku.com/snake-eyes-backend/web
+  WORKER_IMAGE_NAME_HEROKU_REGISTRY: registry.heroku.com/snake-eyes-worker/web
+
+jobs:
+  build:
+    runs-on: "ubuntu-latest"
+    steps:
+      - uses: "actions/checkout@v2"
+
+      - name: "Login the github docker container registry"
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login --username ${{ github.actor }} --password-stdin docker.pkg.github.com
+
+      - name: "Build the Docker image for backend"
+        run: |
+          docker image build --file backend.Dockerfile --tag $BACKEND_IMAGE_NAME_GITHUB_REGISTRY:$GITHUB_SHA .
+          docker image push $BACKEND_IMAGE_NAME_GITHUB_REGISTRY:$GITHUB_SHA
+
+      - name: "Build the Docker image for worker"
+        run: |
+          docker image build --file worker.Dockerfile --tag $WORKER_IMAGE_NAME_GITHUB_REGISTRY:$GITHUB_SHA .
+          docker image push $WORKER_IMAGE_NAME_GITHUB_REGISTRY:$GITHUB_SHA
+
+  push:
+    needs: build
+    runs-on: "ubuntu-latest"
+    steps:
+      - uses: "actions/checkout@v2"
+
+      - name: "Pull the current docker image for backend and worker"
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login --username ${{ github.actor }} --password-stdin docker.pkg.github.com
+          docker image pull $BACKEND_IMAGE_NAME_GITHUB_REGISTRY:$GITHUB_SHA
+          docker image pull $WORKER_IMAGE_NAME_GITHUB_REGISTRY:$GITHUB_SHA
+
+      - name: "Login the heroku docker registry"
+        run: docker login --username _ --password ${{ secrets.HEROKU_AUTH_TOKEN }} registry.heroku.com
+
+      - name: "Tag and Push the Docker image for backend"
+        run: |
+          docker image tag $BACKEND_IMAGE_NAME_GITHUB_REGISTRY:$GITHUB_SHA $BACKEND_IMAGE_NAME_HEROKU_REGISTRY:$GITHUB_SHA
+          docker image push $BACKEND_IMAGE_NAME_HEROKU_REGISTRY:$GITHUB_SHA
+
+      - name: "Tag Push the Docker image for worker"
+        run: |
+          docker image tag $WORKER_IMAGE_NAME_GITHUB_REGISTRY:$GITHUB_SHA $WORKER_IMAGE_NAME_HEROKU_REGISTRY:$GITHUB_SHA
+          docker image push $WORKER_IMAGE_NAME_HEROKU_REGISTRY:$GITHUB_SHA
