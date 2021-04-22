@@ -1,0 +1,26 @@
+name: "Pipeline"
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+env:
+  BACKEND_IMAGE_NAME: docker.pkg.github.com/onlinejudge95/snake_eyes_backend:$(date +%s)
+  # WORKER_IMAGE_NAME: docker.pkg.github.com/onlinejudge95/snake_eyes_worker:$(date +%s)
+
+jobs:
+  build:
+    runs-on: "ubuntu-latest"
+    steps:
+    - uses: "actions/checkout@v2"
+
+    - name: "Login the docker registry"
+      run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login --username ${{ github.actor }} --password-stdin docker.pkg.github.com
+
+    - name: "Build the Docker images"
+      run: docker image build --file Dockerfile --tag $BACKEND_IMAGE_NAME
+
+    - name: "Push the images to the registry"
+      run: docker image push $BACKEND_IMAGE_NAME
