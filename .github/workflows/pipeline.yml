@@ -25,6 +25,7 @@ jobs:
         run: docker image build --file worker.Dockerfile --tag worker:latest .
 
   push-github:
+    needs: build
     runs-on: "ubuntu-latest"
     steps:
       - uses: "actions/checkout@v2"
@@ -43,6 +44,7 @@ jobs:
           docker image push $WORKER_IMAGE_NAME_GITHUB_REGISTRY:$GITHUB_SHA
 
   push-heroku:
+    needs: build
     runs-on: "ubuntu-latest"
     steps:
       - uses: "actions/checkout@v2"
