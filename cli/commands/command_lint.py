@@ -48,5 +48,22 @@ def isort(check_only, path):
     return call(shell_command, shell=True)
 
 
+@command()
+@option("--check-only/--no-check-only", default=False, help="Only check")
+@argument("path", default="/snake_eyes")
+def black(check_only, path):
+    """
+    Run formatting with black.
+
+    :param path: path for sorting imports
+
+    :return: Subprocess call result
+    """
+    flag = "--check" if check_only else ""
+    shell_command = f"black --target-version py37 {flag} {path}"
+    return call(shell_command, shell=True)
+
+
 cli.add_command(flake8)
 cli.add_command(isort)
+cli.add_command(black)
