@@ -23,15 +23,17 @@ from snake_eyes.blueprints.user.models import db
 
 
 class BulkDeleteForm(Form):
-    SCOPE = OrderedDict([
-        ("all_selected_items", "All selected items"),
-        ("all_search_results", "All search items")
-    ])
+    SCOPE = OrderedDict(
+        [
+            ("all_selected_items", "All selected items"),
+            ("all_search_results", "All search items"),
+        ]
+    )
 
     scope = SelectField(
         "Privileges",
         [DataRequired()],
-        choices=choices_from_dict(SCOPE, prepend_blank=False)
+        choices=choices_from_dict(SCOPE, prepend_blank=False),
     )
 
 
@@ -47,17 +49,14 @@ class UserForm(ModelForm):
             Unique(User.username, get_session=lambda: db.session),
             Optional(),
             Length(1, 16),
-            Regexp(r"^\w+$", message=error_message)
+            Regexp(r"^\w+$", message=error_message),
         ]
     )
-    coins = IntegerField(
-        "Coins",
-        [DataRequired(), NumberRange(min=1, max=2147483647)]
-    )
+    coins = IntegerField("Coins", [DataRequired(), NumberRange(min=1, max=2147483647)])
     role = SelectField(
         "Privileges",
         [DataRequired()],
-        choices=choices_from_dict(User.ROLE, prepend_blank=False)
+        choices=choices_from_dict(User.ROLE, prepend_blank=False),
     )
     active = BooleanField("Yes, allow this user to sign in")
 
@@ -75,12 +74,14 @@ class CouponForm(Form):
     )
     code = StringField("Code", [DataRequired(), Length(1, 32)])
     currency = SelectField(
-        "Currency", [DataRequired()],
-        choices=choices_from_dict(Currency.TYPES, prepend_blank=False)
+        "Currency",
+        [DataRequired()],
+        choices=choices_from_dict(Currency.TYPES, prepend_blank=False),
     )
     duration = SelectField(
-        "Duration", [DataRequired()],
-        choices=choices_from_dict(Coupon.DURATION, prepend_blank=False)
+        "Duration",
+        [DataRequired()],
+        choices=choices_from_dict(Coupon.DURATION, prepend_blank=False),
     )
     duration_in_months = IntegerField(
         "Duration in months", [Optional(), NumberRange(min=1, max=12)]
@@ -88,9 +89,7 @@ class CouponForm(Form):
     max_redemptions = IntegerField(
         "Max Redemptions", [Optional(), NumberRange(min=1, max=2147483647)]
     )
-    redeem_by = DateTimeField(
-        "Redeem by", [Optional()], format="%Y-%m-%d %H:%M:%S"
-    )
+    redeem_by = DateTimeField("Redeem by", [Optional()], format="%Y-%m-%d %H:%M:%S")
 
     def validate(self):
         if not Form.validate(self):

@@ -28,7 +28,8 @@ class Subscription(ResourceMixin, db.Model):
     user_id = db.Column(
         db.Integer,
         db.ForeignKey("users.id", onupdate="CASCADE", ondelete="CASCADE"),
-        index=True, nullable=False
+        index=True,
+        nullable=False,
     )
 
     # Subscription details.
@@ -97,8 +98,10 @@ class Subscription(ResourceMixin, db.Model):
         user.name = name
         user.previous_plan = plan
         user.coins = add_subscription_coins(
-            user.coins, Subscription.get_plan_by_id(user.previous_plan),
-            Subscription.get_plan_by_id(plan), user.cancelled_subscription_on
+            user.coins,
+            Subscription.get_plan_by_id(user.previous_plan),
+            Subscription.get_plan_by_id(plan),
+            user.cancelled_subscription_on,
         )
         user.cancelled_subscription_on = None
 
@@ -106,15 +109,11 @@ class Subscription(ResourceMixin, db.Model):
         self.plan = plan
 
         if coupon:
-            coupon = Coupon \
-                .query \
-                .filter(Coupon.code == self.coupon) \
-                .first()
+            coupon = Coupon.query.filter(Coupon.code == self.coupon).first()
             coupon.redeem()
 
         credit_card = CreditCard(
-            user_id=user.id,
-            **CreditCard.extract_card_params(customer)
+            user_id=user.id, **CreditCard.extract_card_params(customer)
         )
 
         db.session.add(user)
@@ -142,16 +141,15 @@ class Subscription(ResourceMixin, db.Model):
         user.previous_plan = user.subscription.plan
         user.subscription.plan = plan
         user.coins = add_subscription_coins(
-            user.coins, Subscription.get_plan_by_id(user.previous_plan),
-            Subscription.get_plan_by_id(plan), user.cancelled_subscription_on
+            user.coins,
+            Subscription.get_plan_by_id(user.previous_plan),
+            Subscription.get_plan_by_id(plan),
+            user.cancelled_subscription_on,
         )
 
         if coupon:
             user.subscription.coupon = coupon
-            coupon = Coupon \
-                .query \
-                .filter(Coupon.code == coupon) \
-                .first()
+            coupon = Coupon.query.filter(Coupon.code == coupon).first()
 
             if coupon:
                 coupon.redeem()
@@ -187,9 +185,7 @@ class Subscription(ResourceMixin, db.Model):
 
         return True
 
-    def update_payment_method(
-        self, user=None, credit_card=None, name=None, token=None
-    ):
+    def update_payment_method(self, user=None, credit_card=None, name=None, token=None):
         """
         Update the subscription.
 

@@ -7,16 +7,10 @@ class TestContactTask:
         """
         Deliver a contact email.
         """
-        payload = {
-            "email": "foo@example.com",
-            "message": "Test message"
-        }
+        payload = {"email": "foo@example.com", "message": "Test message"}
 
         with mail.record_messages() as outbox:
-            deliver_contact_email(
-                email=payload["email"],
-                message=payload["message"]
-            )
+            deliver_contact_email(email=payload["email"], message=payload["message"])
 
             assert len(outbox) == 1
             assert payload["email"] in outbox[0].body

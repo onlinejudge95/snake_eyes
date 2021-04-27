@@ -22,10 +22,7 @@ config = context.config
 # This line sets up loggers basically.
 fileConfig(config.config_file_name)
 
-config.set_main_option(
-    "sqlalchemy.url",
-    app.config["SQLALCHEMY_DATABASE_URI"]
-)
+config.set_main_option("sqlalchemy.url", app.config["SQLALCHEMY_DATABASE_URI"])
 # add your model's MetaData object here
 # for 'autogenerate' support
 # from myapp import mymodel
@@ -52,7 +49,8 @@ def run_migrations_offline():
     """
     context.configure(
         url=app.config["SQLALCHEMY_DATABASE_URI"],
-        target_metadata=target_metadata, literal_binds=True
+        target_metadata=target_metadata,
+        literal_binds=True,
     )
 
     with context.begin_transaction():
@@ -72,8 +70,9 @@ def run_migrations_online():
 
     with connectable.connect() as connection:
         context.configure(
-            url=app.config["SQLALCHEMY_DATABASE_URI"], connection=connection,
-            target_metadata=target_metadata
+            url=app.config["SQLALCHEMY_DATABASE_URI"],
+            connection=connection,
+            target_metadata=target_metadata,
         )
 
         with context.begin_transaction():

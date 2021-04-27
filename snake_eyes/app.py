@@ -84,7 +84,7 @@ def create_celery(app=None):
     celery = Celery(
         app.import_name,
         broker=app.config["CELERY_BROKER_URL"],
-        include=app.config["CELERY_TASK_LIST"]
+        include=app.config["CELERY_TASK_LIST"],
     )
     celery.conf.update(app.config)
 
@@ -156,6 +156,7 @@ def error_handler(app):
 
     :param app: Flask app instance
     """
+
     def render_status(status):
         """
         Render custom tempaltes for specific errors
@@ -182,7 +183,7 @@ def exception_handler(app):
         [app.config.get("MAIL_USERNAME")],
         "[Exception Handler] A 5xx was thrown",
         (app.config.get("MAIL_USERNAME"), app.config.get("MAIL_PASSWORD")),
-        secure=()
+        secure=(),
     )
     mail_handler.setLevel(ERROR)
     mail_handler.setFormatter(
@@ -220,11 +221,10 @@ def locale(app):
     :param app: Flask application instance
     :return: str
     """
+
     @babel.localeselector
     def get_locale():
         if current_user.is_authenticated:
             return current_user.locale
 
-        return request \
-            .accept_languages \
-            .best_match(app.config.get("LANGUAGES").keys())
+        return request.accept_languages.best_match(app.config.get("LANGUAGES").keys())

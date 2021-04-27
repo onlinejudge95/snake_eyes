@@ -30,11 +30,11 @@ def before_request():
 @limiter.limit("3/second")
 def place_bet():
     if request.method == "GET":
-        recent_bets = Bet \
-            .query \
-            .filter(Bet.user_id == current_user.id) \
-            .order_by(Bet.created_on.desc()) \
+        recent_bets = (
+            Bet.query.filter(Bet.user_id == current_user.id)
+            .order_by(Bet.created_on.desc())
             .limit(10)
+        )
 
         return render_template("bet/place_bet.html", recent_bets=recent_bets)
 
@@ -64,7 +64,7 @@ def place_bet():
             "roll": outcome,
             "wagered": wagered,
             "payout": payout,
-            "net": net
+            "net": net,
         }
 
         bet = Bet(**params)
@@ -79,10 +79,10 @@ def place_bet():
 @bp.route("/history", defaults={"page": 1})
 @bp.route("/history/page/<int:page>")
 def history(page):
-    paginated_bets = Bet \
-        .query \
-        .filter(Bet.user_id == current_user.id) \
-        .order_by(Bet.created_on.desc()) \
+    paginated_bets = (
+        Bet.query.filter(Bet.user_id == current_user.id)
+        .order_by(Bet.created_on.desc())
         .paginate(page, 50, True)
+    )
 
     return render_template("bet/history.html", bets=paginated_bets)

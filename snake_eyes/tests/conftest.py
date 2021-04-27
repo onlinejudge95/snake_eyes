@@ -42,7 +42,7 @@ def app():
         "DEBUG": False,
         "WTF_CSRF_ENABLED": False,
         "TESTING": True,
-        "SQLALCHEMY_DATABASE_URI": f"{settings.SQLALCHEMY_DATABASE_URI}_test"
+        "SQLALCHEMY_DATABASE_URI": f"{settings.SQLALCHEMY_DATABASE_URI}_test",
     }
     test_app = create_app(settings_override=params)
 
@@ -74,11 +74,7 @@ def db(app):
     _db.drop_all()
     _db.create_all()
 
-    params = {
-        "role": "admin",
-        "email": "admin@localhost",
-        "password": "password"
-    }
+    params = {"role": "admin", "email": "admin@localhost", "password": "password"}
 
     admin = User(**params)
 
@@ -130,7 +126,7 @@ def users(db):
 
     users = [
         {"role": "admin", "email": "admin@localhost", "password": "password"},
-        {"active": False, "email": "disabl@localhost", "password": "password"}
+        {"active": False, "email": "disabl@localhost", "password": "password"},
     ]
 
     for user in users:
@@ -154,13 +150,12 @@ def credit_cards(db):
     june_1_2021 = utc.localize(datetime(2021, 6, 14, 0, 0, 0))
 
     credit_cards = [
+        {"user_id": 1, "brand": "Visa", "last4": 4242, "exp_date": june_1_2021},
         {
-            "user_id": 1, "brand": "Visa", "last4": 4242,
-            "exp_date": june_1_2021
-        },
-        {
-            "user_id": 2, "brand": "Visa", "last4": 4242,
-            "exp_date": timedelta_month(12, may_1_2021)
+            "user_id": 2,
+            "brand": "Visa",
+            "last4": 4242,
+            "exp_date": timedelta_month(12, may_1_2021),
         },
     ]
 
@@ -218,7 +213,7 @@ def subscriptions(db):
         "email": "subscriber@localhost",
         "name": "test_user",
         "password": "password",
-        "payment_id": "customer_000"
+        "payment_id": "customer_000",
     }
 
     subscriber = User(**params)
@@ -226,10 +221,7 @@ def subscriptions(db):
     db.session.add(subscriber)
     db.session.commit()
 
-    params = {
-        "user_id": subscriber.id,
-        "plan": "gold"
-    }
+    params = {"user_id": subscriber.id, "plan": "gold"}
 
     subscription = Subscription(**params)
     db.session.add(subscription)
@@ -238,7 +230,7 @@ def subscriptions(db):
         "user_id": subscriber.id,
         "brand": "Visa",
         "last4": "4242",
-        "exp_date": date(2021, 6, 1)
+        "exp_date": date(2021, 6, 1),
     }
     credit_card = CreditCard(**params)
     db.session.add(credit_card)
@@ -268,10 +260,7 @@ def mock_stripe():
                     "amount": 0,
                     "currency": "usd",
                     "proration": False,
-                    "period": {
-                        "start": 1433161742,
-                        "end": 1434371342
-                    },
+                    "period": {"start": 1433161742, "end": 1434371342},
                     "subscription": None,
                     "quantity": 1,
                     "plan": {
@@ -285,19 +274,17 @@ def mock_stripe():
                         "livemode": False,
                         "interval_count": 1,
                         "trial_period_days": 14,
-                        "metadata": {
-                        },
-                        "statement_descriptor": "GOLD MONTHLY"
+                        "metadata": {},
+                        "statement_descriptor": "GOLD MONTHLY",
                     },
                     "description": None,
                     "discountable": True,
-                    "metadata": {
-                    }
+                    "metadata": {},
                 }
             ],
             "total_count": 1,
             "object": "list",
-            "url": "/v1/invoices/in_000/lines"
+            "url": "/v1/invoices/in_000/lines",
         },
         "subtotal": 0,
         "total": 0,
@@ -321,11 +308,10 @@ def mock_stripe():
         "subscription": "sub_000",
         "tax_percent": None,
         "tax": None,
-        "metadata": {
-        },
+        "metadata": {},
         "statement_descriptor": None,
         "description": None,
-        "receipt_number": None
+        "receipt_number": None,
     }
     PaymentCoupon.create = Mock(return_value={})
     PaymentCoupon.delete = Mock(return_value={})

@@ -26,7 +26,8 @@ class Invoice(ResourceMixin, db.Model):
     user_id = db.Column(
         db.Integer,
         db.ForeignKey("users.id", onupdate="CASCADE", ondelete="CASCADE"),
-        index=True, nullable=False
+        index=True,
+        nullable=False,
     )
 
     # Invoice details
@@ -82,7 +83,9 @@ class Invoice(ResourceMixin, db.Model):
             "payment_id": data["customer"],
             "plan": data["lines"]["data"][0]["plan"]["name"],
             "receipt_number": data["receipt_number"],
-            "description": data["lines"]["data"][0]["plan"]["statement_descriptor"],  # noqa: E501
+            "description": data["lines"]["data"][0]["plan"][
+                "statement_descriptor"
+            ],  # noqa: E501
             "period_start_on": datetime.utcfromtimestamp(
                 data["lines"]["data"][0]["period"]["start"]
             ).date(),
@@ -92,7 +95,7 @@ class Invoice(ResourceMixin, db.Model):
             "currency": data["currency"],
             "tax": data["tax"],
             "tax_percent": data["tax_percent"],
-            "total": data["total"]
+            "total": data["total"],
         }
 
     @classmethod
@@ -109,7 +112,7 @@ class Invoice(ResourceMixin, db.Model):
             "description": plan_info["statement_descriptor"],
             "next_bill_on": datetime.utcfromtimestamp(payload["date"]),
             "amount_due": payload["amount_due"],
-            "interval": plan_info["interval"]
+            "interval": plan_info["interval"],
         }
 
     @classmethod
@@ -123,10 +126,9 @@ class Invoice(ResourceMixin, db.Model):
         """
         from snake_eyes.blueprints.user.models import User
 
-        user = User \
-            .query \
-            .filter(User.payment_id == parsed_event.get("payment_id")) \
-            .first()
+        user = User.query.filter(
+            User.payment_id == parsed_event.get("payment_id")
+        ).first()
 
         if user and user.credit_card:
             parsed_event["user_id"] = user.id
@@ -154,8 +156,7 @@ class Invoice(ResourceMixin, db.Model):
         return Invoice.parse_from_api(PaymentInvoice.upcoming(customer_id))
 
     def create(
-        self, user=None, currency=None, amount=None, coins=None, coupon=None,
-        token=None
+        self, user=None, currency=None, amount=None, coins=None, coupon=None, token=None
     ):
         """
         Create an invoice item.

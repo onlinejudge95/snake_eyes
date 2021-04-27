@@ -11,7 +11,8 @@ class Bet(ResourceMixin, db.Model):
     user_id = db.Column(
         db.Integer,
         db.ForeignKey("users.id", onupdate="CASCADE", ondelete="CASCADE"),
-        index=True, nullable=False
+        index=True,
+        nullable=False,
     )
 
     # Attributes for betting
@@ -94,5 +95,5 @@ class Bet(ResourceMixin, db.Model):
             "wagered": self.wagered,
             "payout": self.payout,
             "net": self.net,
-            "is_winner": Bet.is_winner(self.guess, self.roll)
+            "is_winner": Bet.is_winner(self.guess, self.roll),
         }

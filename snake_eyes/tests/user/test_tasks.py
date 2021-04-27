@@ -5,7 +5,7 @@ from snake_eyes.extensions import mail
 
 class TestTasks:
     def test_deliever_password_reset_email(self, token):
-        """ Test if a password reset mail is delievered properly"""
+        """Test if a password reset mail is delievered properly"""
 
         with mail.record_messages() as outbox:
             user = User.find_by_identity("admin@localhost")

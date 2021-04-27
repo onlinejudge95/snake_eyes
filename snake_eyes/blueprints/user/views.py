@@ -63,10 +63,7 @@ def begin_password_reset():
     if form.validate_on_submit():
         user = User.initialize_password_reset(request.form.get("identity"))
 
-        flash(
-            f"An email with instructions have been sent to {user.email}",
-            "success"
-        )
+        flash(f"An email with instructions have been sent to {user.email}", "success")
         return redirect(url_for("user.login"))
 
     return render_template("user/begin_password_reset.html", form=form)

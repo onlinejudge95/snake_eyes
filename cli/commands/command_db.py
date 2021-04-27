@@ -17,7 +17,9 @@ def cli():
 @argument("message")
 @argument("revision_id")
 def migration(message, revision_id):
-    shell_command = f"alembic revision --autogenerate --message '{message}' --rev-id {revision_id}"
+    shell_command = (
+        f"alembic revision --autogenerate --message '{message}' --rev-id {revision_id}"
+    )
     return call(shell_command, shell=True)
 
 

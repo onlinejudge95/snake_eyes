@@ -15,11 +15,7 @@ def cli():
 
 
 @command()
-@option(
-    "--skip-init/--no-skip-init",
-    default=True,
-    help="Skip __init__.py files?"
-)
+@option("--skip-init/--no-skip-init", default=True, help="Skip __init__.py files?")
 @argument("path", default="/snake_eyes")
 def flake8(skip_init, path):
     """
@@ -37,7 +33,7 @@ def flake8(skip_init, path):
 
 
 @command()
-@option("--check-only/--no-check-only", default=False, help="Only check and do not sort")
+@option("--check-only/--no-check-only", default=False, help="Only check")
 @argument("path", default="/snake_eyes")
 def isort(check_only, path):
     """

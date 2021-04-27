@@ -11,11 +11,7 @@ from snake_eyes.blueprints.billing.models.subscription import Subscription
 from snake_eyes.extensions import csrf
 
 
-bp = Blueprint(
-    "stripe_webhook",
-    __name__,
-    url_prefix="/stripe_webhook"
-)
+bp = Blueprint("stripe_webhook", __name__, url_prefix="/stripe_webhook")
 
 
 @bp.route("/event", methods=["POST"])

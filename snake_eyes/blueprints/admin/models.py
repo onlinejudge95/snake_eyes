@@ -45,13 +45,14 @@ class Dashboard:
 
         :return: tuple
         """
-        count = db.session.query(Subscription) \
-            .filter(Subscription.coupon.isnot(None)) \
+        count = (
+            db.session.query(Subscription)
+            .filter(Subscription.coupon.isnot(None))
             .count()
+        )
         total = db.session.query(func.count(Subscription.id)).scalar()
 
-        percentage = 0 \
-            if total == 0 else round((count / float(total)) * 100, 1)
+        percentage = 0 if total == 0 else round((count / float(total)) * 100, 1)
 
         return count, total, percentage
 

@@ -20,8 +20,7 @@ def index():
         from snake_eyes.blueprints.contact.tasks import deliver_contact_email
 
         deliver_contact_email.delay(
-            request.form.get("email"),
-            request.form.get("message")
+            request.form.get("email"), request.form.get("message")
         )
 
         flash("Thanks, expect a response shortly.", "success")

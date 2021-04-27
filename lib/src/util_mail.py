@@ -46,11 +46,7 @@ def send_templated_message(template=None, context={}, *args, **kwargs):
             raise Exception("You cannot have both a template and body arg.")
 
         kwargs["body"] = _render_template(template, **context)
-        kwargs["html"] = _render_template(
-            template,
-            extension="html",
-            **context
-        )
+        kwargs["html"] = _render_template(template, extension="html", **context)
 
     mail.send_message(*args, **kwargs)
 

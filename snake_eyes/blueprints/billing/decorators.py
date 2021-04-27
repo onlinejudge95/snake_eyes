@@ -19,6 +19,7 @@ def handle_stripe_exceptions(function):
     :type function: Function
     :return: Function
     """
+
     @wraps(function)
     def decorated_function(*args, **kwargs):
         try:
@@ -33,16 +34,10 @@ def handle_stripe_exceptions(function):
             flash("Authentication with our payment gateway failed", "error")
             return redirect(url_for("user.settings"))
         except APIConnectionError:
-            flash(
-                "Our payment gateway is having connectivity issues",
-                "error"
-            )
+            flash("Our payment gateway is having connectivity issues", "error")
             return redirect(url_for("user.settings"))
         except StripeError:
-            flash(
-                "Our payment gateway is having issues, please try again.",
-                "error"
-            )
+            flash("Our payment gateway is having issues, please try again.", "error")
             return redirect(url_for("user.settings"))
 
     return decorated_function
@@ -54,6 +49,7 @@ def subscription_required(function):
 
     :return: Function
     """
+
     @wraps(function)
     def decorated_function(*args, **kwargs):
         if not current_user.subscription:

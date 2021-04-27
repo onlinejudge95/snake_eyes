@@ -13,10 +13,7 @@ def cli():
     List all available routes
     """
     output = {
-        rule.endpoint: {
-            "path": rule.rule,
-            "methods": f"({','.join(rule.methods)})"
-        }
+        rule.endpoint: {"path": rule.rule, "methods": f"({','.join(rule.methods)})"}
         for rule in app.url_map.iter_rules()
     }
 

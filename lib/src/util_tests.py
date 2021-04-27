@@ -6,6 +6,7 @@ class ViewTestMixin:
     """
     Automatically loads a session and a client
     """
+
     @fixture(autouse=True)
     def set_common_fixtures(self, session, client):
         self.session = session

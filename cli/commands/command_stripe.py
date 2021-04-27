@@ -33,9 +33,10 @@ def sync():
 
             if plan:
                 PaymentPlan.update(
-                    id=value.get("id"), name=value.get("name"),
+                    id=value.get("id"),
+                    name=value.get("name"),
                     metadata=value.get("metadata"),
-                    statement_descriptor=value.get("statement_descriptor")
+                    statement_descriptor=value.get("statement_descriptor"),
                 )
             else:
                 PaymentPlan.create(**value)

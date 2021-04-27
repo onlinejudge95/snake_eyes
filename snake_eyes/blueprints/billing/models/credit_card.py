@@ -16,7 +16,8 @@ class CreditCard(ResourceMixin, db.Model):
     user_id = db.Column(
         db.Integer,
         db.ForeignKey("users.id", onupdate="CASCADE", ondelete="CASCADE"),
-        index=True, nullable=False
+        index=True,
+        nullable=False,
     )
 
     # Card details
@@ -56,10 +57,9 @@ class CreditCard(ResourceMixin, db.Model):
             CreditCard.IS_EXPIRING_THRESHOLD_MONTHS, compare_date=compare_date
         )
 
-        CreditCard \
-            .query \
-            .filter(CreditCard.exp_date <= today_with_delta) \
-            .update({CreditCard.is_expiring: True})
+        CreditCard.query.filter(CreditCard.exp_date <= today_with_delta).update(
+            {CreditCard.is_expiring: True}
+        )
 
         return db.session.commit()
 
@@ -79,5 +79,5 @@ class CreditCard(ResourceMixin, db.Model):
             "brand": card_data.brand,
             "last4": card_data.last4,
             "exp_date": exp_date,
-            "is_expiring": CreditCard.is_expiring_soon(exp_date=exp_date)
+            "is_expiring": CreditCard.is_expiring_soon(exp_date=exp_date),
         }

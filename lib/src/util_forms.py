@@ -9,6 +9,7 @@ class ModelForm(Form):
 
     To have CSRF Protection by default we need to inherit from flask_wtf.Form
     """
+
     def __init__(self, obj=None, prefix="", **kwargs):
         Form.__init__(self, obj=obj, prefix=prefix, **kwargs)
         self._obj = obj
