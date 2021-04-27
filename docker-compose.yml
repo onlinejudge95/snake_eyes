@@ -30,7 +30,6 @@ services:
     command: "gunicorn --config 'python:config.gunicorn' --reload snake_eyes.app:create_app()"
     volumes:
       - ".:/snake_eyes"
-      - "./instance:/snake_eyes/instance"
     ports:
       - "8000:8000"
     build:
