@@ -14,5 +14,5 @@ def cli(path):
 
     :return: Subprocess call result
     """
-    shell_command = f"pytest --cov-branch --cov-report term-missing --cov {path}"  # noqa: E501
+    shell_command = f"pytest --cov-branch --cov-report term-missing --cov {path}"
     return call(shell_command, shell=True)

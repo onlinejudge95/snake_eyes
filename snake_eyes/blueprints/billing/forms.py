@@ -16,10 +16,7 @@ def choices_from_coin_bundles():
 
     :return: list
     """
-    return [
-        (str(bundle.get("coins")), bundle.get("label"))
-        for bundle in COIN_BUNDLES
-    ]
+    return [(str(bundle.get("coins")), bundle.get("label")) for bundle in COIN_BUNDLES]
 
 
 class SubscriptionForm(Form):
@@ -30,9 +27,7 @@ class SubscriptionForm(Form):
     coupon_code = StringField(
         _("Do you have a coupon code?"), [Optional(), Length(1, 128)]
     )
-    name = StringField(
-        _("Name on card"), [DataRequired(), Length(1, 254)]
-    )
+    name = StringField(_("Name on card"), [DataRequired(), Length(1, 254)])
 
 
 class UpdateSubscriptionForm(Form):
@@ -50,12 +45,11 @@ class PaymentForm(Form):
         _("Stripe Publishable Key"), [DataRequired(), Length(1, 254)]
     )
     coin_bundles = SelectField(
-        _("How many coins do you want?"), [DataRequired()],
-        choices=choices_from_coin_bundles()
+        _("How many coins do you want?"),
+        [DataRequired()],
+        choices=choices_from_coin_bundles(),
     )
     coupon_code = StringField(
         _("Do you have a coupon code?"), [Optional(), Length(1, 128)]
     )
-    name = StringField(
-        _("Name on card"), [DataRequired(), Length(1, 254)]
-    )
+    name = StringField(_("Name on card"), [DataRequired(), Length(1, 254)])

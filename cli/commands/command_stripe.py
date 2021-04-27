@@ -4,7 +4,9 @@ from click import echo
 from click import group
 
 from snake_eyes.app import create_app
-from snake_eyes.blueprints.billing.gateways.stripecom import Plan as PaymentPlan  # noqa: E501
+from snake_eyes.blueprints.billing.gateways.stripecom import (
+    Plan as PaymentPlan,
+)
 from snake_eyes.extensions import db
 
 
@@ -31,9 +33,10 @@ def sync():
 
             if plan:
                 PaymentPlan.update(
-                    id=value.get("id"), name=value.get("name"),
+                    id=value.get("id"),
+                    name=value.get("name"),
                     metadata=value.get("metadata"),
-                    statement_descriptor=value.get("statement_descriptor")
+                    statement_descriptor=value.get("statement_descriptor"),
                 )
             else:
                 PaymentPlan.create(**value)

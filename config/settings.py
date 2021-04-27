@@ -17,10 +17,7 @@ MAIL_USE_SSL = False
 MAIL_USERNAME = "user@gmail.com"
 MAIL_PASSWORD = "password"
 
-LANGUAGES = {
-    "en": "English",
-    "kl": "Klingon"
-}
+LANGUAGES = {"en": "English", "kl": "Klingon"}
 BABEL_DEFAULT_LOCALE = "en"
 
 CELERY_BROKER_URL = "redis://:devpassword@redis:6379/0"
@@ -37,15 +34,15 @@ CELERY_TASK_LIST = [
 CELERYBEAT_SCHEDULE = {
     "mark-soon-to-expire-credit-cards": {
         "task": "snakeeyes.blueprints.billing.tasks.mark_old_credit_cards",
-        "schedule": crontab(hour=0, minute=0)
+        "schedule": crontab(hour=0, minute=0),
     },
     "expire-old-coupons": {
         "task": "snakeeyes.blueprints.billing.tasks.expire_old_coupons",
-        "schedule": crontab(hour=0, minute=1)
+        "schedule": crontab(hour=0, minute=1),
     },
 }
 
-SQLALCHEMY_DATABASE_URI = "postgresql://snake_eyes:devpassword@postgres:5432/snake_eyes"  # noqa: E501
+SQLALCHEMY_DATABASE_URI = "postgresql://snake_eyes:devpassword@postgres:5432/snake_eyes"
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 SEED_ADMIN_EMAIL = "dev@localhost"
@@ -55,7 +52,6 @@ REMEMBER_COOKIE_DURATION = timedelta(days=90)
 STRIPE_SECRET_KEY = None
 STRIPE_PUBLISHABLE_KEY = None
 STRIPE_API_VERSION = "2016-03-07"
-# STRIPE_CURRENCY = "usd"
 STRIPE_CURRENCY = "inr"
 STRIPE_PLANS = {
     "0": {
@@ -67,9 +63,7 @@ STRIPE_PLANS = {
         "interval_count": 1,
         "trial_period_days": 14,
         "statement_descriptor": "SNAKE EYES BRONZE",
-        "metadata": {
-            "coins": 110
-        }
+        "metadata": {"coins": 110},
     },
     "1": {
         "id": "gold",
@@ -80,10 +74,7 @@ STRIPE_PLANS = {
         "interval_count": 1,
         "trial_period_days": 14,
         "statement_descriptor": "SNAKE EYES GOLD",
-        "metadata": {
-            "coins": 600,
-            "recommended": True
-        }
+        "metadata": {"coins": 600, "recommended": True},
     },
     "2": {
         "id": "platinum",
@@ -94,9 +85,7 @@ STRIPE_PLANS = {
         "interval_count": 1,
         "trial_period_days": 14,
         "statement_descriptor": "SNAKE EYES PLATINUM",
-        "metadata": {
-            "coins": 1500
-        }
+        "metadata": {"coins": 1500},
     },
 }
 
@@ -104,7 +93,7 @@ COIN_BUNDLES = [
     {"coins": 100, "price_in_cents": 100, "label": "100 for $1"},
     {"coins": 1000, "price_in_cents": 900, "label": "1,000 for $9"},
     {"coins": 5000, "price_in_cents": 4000, "label": "5,000 for $40"},
-    {"coins": 10000, "price_in_cents": 7000, "label": "10,000 for $70"}
+    {"coins": 10000, "price_in_cents": 7000, "label": "10,000 for $70"},
 ]
 
 DICE_ROLL_PAYOUT = {
@@ -118,7 +107,7 @@ DICE_ROLL_PAYOUT = {
     "9": 9.0,
     "10": 12.0,
     "11": 18.0,
-    "12": 36.0
+    "12": 36.0,
 }
 
 RATELIMIT_STORAGE_URL = CELERY_BROKER_URL

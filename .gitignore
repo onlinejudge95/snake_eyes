@@ -1,6 +1,6 @@
 __pycache__/
 .pytest_cache/
-env/
 instance/
+venv/
 *.egg-info/
 celerybeat-schedule

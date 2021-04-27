@@ -11,6 +11,7 @@ class AwareDateTime(TypeDecorator):
     """
     Time zone aware utility for storing date time objects
     """
+
     impl = DateTime(timezone=True)
 
     def process_bind_param(self, value, dialect):
@@ -23,11 +24,10 @@ class ResourceMixin:
     """
     Mixin for managing db objects
     """
+
     created_on = db.Column(AwareDateTime(), default=tz_aware_datetime)
     updated_on = db.Column(
-        AwareDateTime(),
-        default=tz_aware_datetime,
-        onupdate=tz_aware_datetime
+        AwareDateTime(), default=tz_aware_datetime, onupdate=tz_aware_datetime
     )
 
     @classmethod
@@ -68,8 +68,7 @@ class ResourceMixin:
         if scope == "all_search_results":
             ids = [
                 str(item[0])
-                for item in cls.query.with_entities(cls.id)
-                .filter(cls.search(query))
+                for item in cls.query.with_entities(cls.id).filter(cls.search(query))
             ]
 
         if omit_ids:
@@ -86,9 +85,9 @@ class ResourceMixin:
         :type ids: list
         :return: int
         """
-        delete_count = cls.query \
-            .filter(cls.id.in_(ids)) \
-            .delete(synchronize_session=False)
+        delete_count = cls.query.filter(cls.id.in_(ids)).delete(
+            synchronize_session=False
+        )
         db.session.commit()
 
         return delete_count
@@ -116,8 +115,6 @@ class ResourceMixin:
         obj_id = hex(id(self))
         columns = self.__table__.c.keys()
 
-        values = ", ".join([
-            f"{column}={getattr(self, column)}" for column in columns
-        ])
+        values = ", ".join([f"{column}={getattr(self, column)}" for column in columns])
 
         return f"<{obj_id} {self.__class__.__name__}({values})>"

@@ -13,13 +13,16 @@ def anonymous_required(url="/settings"):
     :type url: str
     :return: Function
     """
+
     def decorator(function):
         @wraps(function)
         def decorated_function(*args, **kwargs):
             if current_user.is_authenticated:
                 return redirect(url)
             return function(*args, **kwargs)
+
         return decorated_function
+
     return decorator
 
 
@@ -30,6 +33,7 @@ def role_required(*roles):
     :param *roles: Roles that are allowed
     :return: Function
     """
+
     def decorator(function):
         @wraps(function)
         def decorated_function(*args, **kwargs):
@@ -37,5 +41,7 @@ def role_required(*roles):
                 flash("You are not authorized to take that action", "error")
                 return redirect("/")
             return function(*args, **kwargs)
+
         return decorated_function
+
     return decorator

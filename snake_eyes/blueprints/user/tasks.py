@@ -23,5 +23,5 @@ def deliever_password_reset_mail(user_id, reset_token):
             subject="Password reset from snake eyes",
             recipients=[user.email],
             template="user/mail/password_reset",
-            context={"user": user, "reset_token": reset_token}
+            context={"user": user, "reset_token": reset_token},
         )

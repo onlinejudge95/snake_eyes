@@ -11,7 +11,8 @@ from sqlalchemy import or_
 from werkzeug.security import check_password_hash
 from werkzeug.security import generate_password_hash
 
-from lib.src.util_sqlalchemy import AwareDateTime, ResourceMixin
+from lib.src.util_sqlalchemy import AwareDateTime
+from lib.src.util_sqlalchemy import ResourceMixin
 from snake_eyes.blueprints.bet.models.bet import Bet
 from snake_eyes.blueprints.billing.models.credit_card import CreditCard
 from snake_eyes.blueprints.billing.models.invoice import Invoice
@@ -22,10 +23,12 @@ from snake_eyes.extensions import db
 class User(UserMixin, ResourceMixin, db.Model):
     __tablename__ = "users"
 
-    ROLE = OrderedDict([
-        ("member", "Member"),
-        ("admin", "Admin"),
-    ])
+    ROLE = OrderedDict(
+        [
+            ("member", "Member"),
+            ("admin", "Admin"),
+        ]
+    )
 
     id = db.Column(db.Integer, primary_key=True)
 
@@ -44,21 +47,12 @@ class User(UserMixin, ResourceMixin, db.Model):
         db.Enum(*ROLE, name="role_types", native_enum=False),
         index=True,
         nullable=False,
-        server_default="member"
+        server_default="member",
     )
-    active = db.Column(
-        "is_active",
-        db.Boolean(),
-        nullable=False,
-        server_default="1"
-    )
+    active = db.Column("is_active", db.Boolean(), nullable=False, server_default="1")
     username = db.Column(db.String(24), unique=True, index=True)
     email = db.Column(
-        db.String(255),
-        unique=True,
-        index=True,
-        nullable=False,
-        server_default=""
+        db.String(255), unique=True, index=True, nullable=False, server_default=""
     )
     password = db.Column(db.String(128), nullable=False, server_default="")
 
@@ -96,10 +90,9 @@ class User(UserMixin, ResourceMixin, db.Model):
         :type identity: str
         :return: User or None
         """
-        return User \
-            .query \
-            .filter((User.email == identity) | (User.username == identity)) \
-            .first()
+        return User.query.filter(
+            (User.email == identity) | (User.username == identity)
+        ).first()
 
     @classmethod
     def encrypt_password(cls, plaintext_password):
@@ -120,9 +113,7 @@ class User(UserMixin, ResourceMixin, db.Model):
         :type token: str
         :return: User or None
         """
-        private_key = TimedJSONWebSignatureSerializer(
-            current_app.config["SECRET_KEY"]
-        )
+        private_key = TimedJSONWebSignatureSerializer(current_app.config["SECRET_KEY"])
 
         try:
             decoded_payload = private_key.loads(token)
@@ -142,7 +133,10 @@ class User(UserMixin, ResourceMixin, db.Model):
         user = User.find_by_identity(identity)
         reset_token = user.serialize_token()
 
-        from snake_eyes.blueprints.user.tasks import deliever_password_reset_mail  # noqa: E501
+        from snake_eyes.blueprints.user.tasks import (
+            deliever_password_reset_mail,
+        )
+
         deliever_password_reset_mail.delay(user.id, reset_token)
 
         return user
@@ -161,7 +155,7 @@ class User(UserMixin, ResourceMixin, db.Model):
         search_query = f"%{query}%"
         search_chain = (
             User.email.ilike(search_query),
-            User.username.ilike(search_query)
+            User.username.ilike(search_query),
         )
 
         return or_(*search_chain)

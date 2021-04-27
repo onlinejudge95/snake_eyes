@@ -1,7 +1,7 @@
 from sqlalchemy import func
 
-from snake_eyes.blueprints.billing.models.subscription import Subscription
 from snake_eyes.blueprints.bet.models.bet import Bet
+from snake_eyes.blueprints.billing.models.subscription import Subscription
 from snake_eyes.blueprints.user.models import User
 from snake_eyes.blueprints.user.models import db
 
@@ -45,13 +45,14 @@ class Dashboard:
 
         :return: tuple
         """
-        count = db.session.query(Subscription) \
-            .filter(Subscription.coupon.isnot(None)) \
+        count = (
+            db.session.query(Subscription)
+            .filter(Subscription.coupon.isnot(None))
             .count()
+        )
         total = db.session.query(func.count(Subscription.id)).scalar()
 
-        percentage = 0 \
-            if total == 0 else round((count / float(total)) * 100, 1)
+        percentage = 0 if total == 0 else round((count / float(total)) * 100, 1)
 
         return count, total, percentage
 

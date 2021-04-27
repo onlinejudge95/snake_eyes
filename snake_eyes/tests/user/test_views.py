@@ -41,11 +41,7 @@ class TestLoginView(ViewTestMixin):
         """
         response = self.login(identity="disabl@localhost")
 
-        assert_status_with_message(
-            200,
-            response,
-            "The account is disabled"
-        )
+        assert_status_with_message(200, response, "The account is disabled")
 
     def test_login_fail(self):
         """
@@ -53,11 +49,7 @@ class TestLoginView(ViewTestMixin):
         """
         response = self.login(identity="foo@bar")
 
-        assert_status_with_message(
-            200,
-            response,
-            "Identity or password is incorrect"
-        )
+        assert_status_with_message(200, response, "Identity or password is incorrect")
 
     def test_logout(self):
         """
@@ -93,8 +85,7 @@ class TestPasswordResetView(ViewTestMixin):
         self.login()
 
         response = self.client.get(
-            url_for("user.begin_password_reset"),
-            follow_redirects=False
+            url_for("user.begin_password_reset"), follow_redirects=False
         )
         assert response.status_code == 302
 
@@ -105,8 +96,7 @@ class TestPasswordResetView(ViewTestMixin):
         self.login()
 
         response = self.client.get(
-            url_for("user.password_reset"),
-            follow_redirects=False
+            url_for("user.password_reset"), follow_redirects=False
         )
         assert response.status_code == 302
 
@@ -116,16 +106,10 @@ class TestPasswordResetView(ViewTestMixin):
         """
         user = {"identity": "foo@invalid.com"}
         response = self.client.post(
-            url_for("user.begin_password_reset"),
-            data=user,
-            follow_redirects=True
+            url_for("user.begin_password_reset"), data=user, follow_redirects=True
         )
 
-        assert_status_with_message(
-            200,
-            response,
-            "Unable to locate the user"
-        )
+        assert_status_with_message(200, response, "Unable to locate the user")
 
     def test_begin_password_reset(self):
         """
@@ -133,15 +117,13 @@ class TestPasswordResetView(ViewTestMixin):
         """
         user = {"identity": "admin@localhost"}
         response = self.client.post(
-            url_for("user.begin_password_reset"),
-            data=user,
-            follow_redirects=True
+            url_for("user.begin_password_reset"), data=user, follow_redirects=True
         )
 
         assert_status_with_message(
             200,
             response,
-            f"An email with instructions have been sent to {user['identity']}"
+            f"An email with instructions have been sent to {user['identity']}",
         )
 
     def test_password_reset(self, users, token):
@@ -150,16 +132,10 @@ class TestPasswordResetView(ViewTestMixin):
         """
         reset = {"password": "newpassword", "reset_token": token}
         response = self.client.post(
-            url_for("user.password_reset"),
-            data=reset,
-            follow_redirects=True
+            url_for("user.password_reset"), data=reset, follow_redirects=True
         )
 
-        assert_status_with_message(
-            200,
-            response,
-            "Your password has been reset"
-        )
+        assert_status_with_message(200, response, "Your password has been reset")
 
     def test_password_reset_empty_token(self):
         """
@@ -167,15 +143,11 @@ class TestPasswordResetView(ViewTestMixin):
         """
         reset = {"password": "newpassword"}
         response = self.client.post(
-            url_for("user.password_reset"),
-            data=reset,
-            follow_redirects=True
+            url_for("user.password_reset"), data=reset, follow_redirects=True
         )
 
         assert_status_with_message(
-            200,
-            response,
-            "Your reset token has expired or tampered with"
+            200, response, "Your reset token has expired or tampered with"
         )
 
     def test_password_reset_invalid_token(self):
@@ -184,15 +156,11 @@ class TestPasswordResetView(ViewTestMixin):
         """
         reset = {"password": "newpassword", "token": "1234567890"}
         response = self.client.post(
-            url_for("user.password_reset"),
-            data=reset,
-            follow_redirects=True
+            url_for("user.password_reset"), data=reset, follow_redirects=True
         )
 
         assert_status_with_message(
-            200,
-            response,
-            "Your reset token has expired or tampered with"
+            200, response, "Your reset token has expired or tampered with"
         )
 
 
@@ -219,10 +187,7 @@ class TestSignupView(ViewTestMixin):
         """
         self.login()
 
-        response = self.client.get(
-            url_for("user.signup"),
-            follow_redirects=False
-        )
+        response = self.client.get(url_for("user.signup"), follow_redirects=False)
 
         assert response.status_code == 302
 
@@ -232,16 +197,10 @@ class TestSignupView(ViewTestMixin):
         """
         user = {"email": "admin@localhost", "password": "password"}
         response = self.client.post(
-            url_for("user.signup"),
-            data=user,
-            follow_redirects=True
+            url_for("user.signup"), data=user, follow_redirects=True
         )
 
-        assert_status_with_message(
-            200,
-            response,
-            "Already exists"
-        )
+        assert_status_with_message(200, response, "Already exists")
 
     def test_signup(self):
         """
@@ -251,23 +210,15 @@ class TestSignupView(ViewTestMixin):
 
         user = {"email": "user@localhost", "password": "password"}
         response = self.client.post(
-            url_for("user.signup"),
-            data=user,
-            follow_redirects=True
+            url_for("user.signup"), data=user, follow_redirects=True
         )
 
-        assert_status_with_message(
-            200,
-            response,
-            "Awesome, thanks for signing up"
-        )
+        assert_status_with_message(200, response, "Awesome, thanks for signing up")
 
         new_user_count = User.query.count()
 
         assert old_user_count + 1 == new_user_count
-        assert User \
-            .find_by_identity("user@localhost") \
-            .password != user["password"]
+        assert User.find_by_identity("user@localhost").password != user["password"]
 
     def test_welcome(self):
         """
@@ -277,16 +228,10 @@ class TestSignupView(ViewTestMixin):
 
         user = {"username": "hello"}
         response = self.client.post(
-            url_for("user.welcome"),
-            data=user,
-            follow_redirects=True
+            url_for("user.welcome"), data=user, follow_redirects=True
         )
 
-        assert_status_with_message(
-            200,
-            response,
-            "Signup is complete"
-        )
+        assert_status_with_message(200, response, "Signup is complete")
 
     def test_welcome_with_existing_username(self):
         """
@@ -300,16 +245,10 @@ class TestSignupView(ViewTestMixin):
 
         user = {"username": "newuser"}
         response = self.client.post(
-            url_for("user.welcome"),
-            data=user,
-            follow_redirects=True
+            url_for("user.welcome"), data=user, follow_redirects=True
         )
 
-        assert_status_with_message(
-            200,
-            response,
-            "You have already picked a username"
-        )
+        assert_status_with_message(200, response, "You have already picked a username")
 
 
 class TestSettingsView(ViewTestMixin):
@@ -341,21 +280,12 @@ class TestUpdateCredentialsView(ViewTestMixin):
         """
         self.login()
 
-        user = {
-            "current_password": "wrongpassword",
-            "email": "admin@localhost"
-        }
+        user = {"current_password": "wrongpassword", "email": "admin@localhost"}
         response = self.client.post(
-            url_for("user.update_credentials"),
-            data=user,
-            follow_redirects=True
+            url_for("user.update_credentials"), data=user, follow_redirects=True
         )
 
-        assert_status_with_message(
-            200,
-            response,
-            "Does not match"
-        )
+        assert_status_with_message(200, response, "Does not match")
 
     # def test_begin_update_credentials_deactivated_account(self):
     #     """
@@ -384,16 +314,10 @@ class TestUpdateCredentialsView(ViewTestMixin):
 
         user = {"current_password": "password", "email": "admin2@localhost"}
         response = self.client.post(
-            url_for("user.update_credentials"),
-            data=user,
-            follow_redirects=True
+            url_for("user.update_credentials"), data=user, follow_redirects=True
         )
 
-        assert_status_with_message(
-            200,
-            response,
-            "Your sign in settings are updated"
-        )
+        assert_status_with_message(200, response, "Your sign in settings are updated")
 
     def test_begin_update_credentials_password_change(self):
         """
@@ -404,12 +328,10 @@ class TestUpdateCredentialsView(ViewTestMixin):
         user = {
             "current_password": "password",
             "email": "admin@localhost",
-            "password": "newpassword"
+            "password": "newpassword",
         }
         response = self.client.post(
-            url_for("user.update_credentials"),
-            data=user,
-            follow_redirects=True
+            url_for("user.update_credentials"), data=user, follow_redirects=True
         )
 
         assert response.status_code == 200
@@ -428,12 +350,10 @@ class TestUpdateCredentialsView(ViewTestMixin):
         user = {
             "current_password": "password",
             "email": "admin2@localhost",
-            "password": "newpassword"
+            "password": "newpassword",
         }
         response = self.client.post(
-            url_for("user.update_credentials"),
-            data=user,
-            follow_redirects=True
+            url_for("user.update_credentials"), data=user, follow_redirects=True
         )
 
         assert response.status_code == 200

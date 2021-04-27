@@ -1,5 +1,5 @@
-from stripe import Coupon as StripeCoupon
 from stripe import Charge as StripeCharge
+from stripe import Coupon as StripeCoupon
 from stripe import Customer as StripeCustomer
 from stripe import Event as StripeEvent
 from stripe import Invoice as StripeInvoice
@@ -10,9 +10,15 @@ from stripe.error import StripeError
 class Coupon:
     @classmethod
     def create(
-        cls, code=None, duration=None, amount_off=None, percent_off=None,
-        currency=None, duration_in_months=None, max_redemptions=None,
-        redeem_by=None
+        cls,
+        code=None,
+        duration=None,
+        amount_off=None,
+        percent_off=None,
+        currency=None,
+        duration_in_months=None,
+        max_redemptions=None,
+        redeem_by=None,
     ):
         """
         Create a new coupon
@@ -38,10 +44,14 @@ class Coupon:
         :return: Stripe coupon
         """
         return StripeCoupon.create(
-            id=code, duration=duration, amount_off=amount_off,
-            percent_off=percent_off, currency=currency,
+            id=code,
+            duration=duration,
+            amount_off=amount_off,
+            percent_off=percent_off,
+            currency=currency,
             duration_in_months=duration_in_months,
-            max_redemptions=max_redemptions, redeem_by=redeem_by
+            max_redemptions=max_redemptions,
+            redeem_by=redeem_by,
         )
 
     @classmethod
@@ -179,9 +189,16 @@ class Plan:
 
     @classmethod
     def create(
-        cls, _id=None, name=None, amount=None, currency=None, interval=None,
-        interval_count=None, trial_period_days=None, metadata=None,
-        statement_descriptor=None
+        cls,
+        _id=None,
+        name=None,
+        amount=None,
+        currency=None,
+        interval=None,
+        interval_count=None,
+        trial_period_days=None,
+        metadata=None,
+        statement_descriptor=None,
     ):
         """
         Create a new plan.
@@ -211,18 +228,21 @@ class Plan:
         """
         try:
             return StripePlan.create(
-                id=_id, name=name, amount=amount, currency=currency,
-                interval=interval, interval_count=interval_count,
-                trial_period_days=trial_period_days, metadata=metadata,
-                statement_descriptor=statement_descriptor
+                id=_id,
+                name=name,
+                amount=amount,
+                currency=currency,
+                interval=interval,
+                interval_count=interval_count,
+                trial_period_days=trial_period_days,
+                metadata=metadata,
+                statement_descriptor=statement_descriptor,
             )
         except StripeError as e:
             print(e)
 
     @classmethod
-    def update(
-        cls, id=None, name=None, metadata=None, statement_descriptor=None
-    ):
+    def update(cls, id=None, name=None, metadata=None, statement_descriptor=None):
         """
         Update an existing plan.
 
@@ -306,10 +326,7 @@ class Customer:
         :type plan: str
         :return: Stripe customer
         """
-        params = {
-            "source": token,
-            "email": email
-        }
+        params = {"source": token, "email": email}
 
         if plan:
             params["plan"] = plan
@@ -335,6 +352,8 @@ class Charge:
         :return: Stripe charge
         """
         return StripeCharge.create(
-            amount=amount, currency=currency, customer=customer_id,
-            statement_descriptor="SNAKEEYES COINS"
+            amount=amount,
+            currency=currency,
+            customer=customer_id,
+            statement_descriptor="SNAKEEYES COINS",
         )

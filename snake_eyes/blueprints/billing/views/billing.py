@@ -23,10 +23,7 @@ from snake_eyes.blueprints.billing.models.subscription import Subscription
 
 
 bp = Blueprint(
-    "billing",
-    __name__,
-    template_folder="../templates",
-    url_prefix="/subscription"
+    "billing", __name__, template_folder="../templates", url_prefix="/subscription"
 )
 
 
@@ -52,9 +49,11 @@ def coupon_code():
 
     coupon = Coupon.find_by_code(code)
 
-    return render_json(404, {"error": "Coupon code not found"}) \
-        if coupon is None else \
-        render_json(200, {"data": coupon.to_json()})
+    return (
+        render_json(404, {"error": "Coupon code not found"})
+        if coupon is None
+        else render_json(200, {"data": coupon.to_json()})
+    )
 
 
 @bp.route("/create", methods=["GET", "POST"])
@@ -78,10 +77,11 @@ def create():
     if form.validate_on_submit():
         subscription = Subscription()
         created = subscription.create(
-            user=current_user, name=request.form.get("name"),
+            user=current_user,
+            name=request.form.get("name"),
             plan=request.form.get("plan"),
             coupon=request.form.get("coupon_code"),
-            token=request.form.get("stripe_token")
+            token=request.form.get("stripe_token"),
         )
 
         if created:
@@ -112,15 +112,14 @@ def update():
         if request.method == "POST":
             return redirect(url_for("billing.update"))
 
-    form = UpdateSubscriptionForm(
-        coupon_code=current_user.subscription.coupon
-    )
+    form = UpdateSubscriptionForm(coupon_code=current_user.subscription.coupon)
 
     if form.validate_on_submit():
         subscription = Subscription()
         updated = subscription.update(
-            user=current_user, coupon=request.form.get("coupon_code"),
-            plan=plan.get("id")
+            user=current_user,
+            coupon=request.form.get("coupon_code"),
+            plan=plan.get("id"),
         )
 
         if updated:
@@ -128,8 +127,10 @@ def update():
             return redirect(url_for("user.settings"))
 
     return render_template(
-        "billing/pricing.html", form=form, plans=settings.STRIPE_PLANS,
-        active_plan=active_plan
+        "billing/pricing.html",
+        form=form,
+        plans=settings.STRIPE_PLANS,
+        active_plan=active_plan,
     )
 
 
@@ -150,7 +151,7 @@ def cancel():
         if cancelled:
             flash(
                 _("Sorry to see you go, your subscription has been cancelled"),
-                "success"
+                "success",
             )
             return redirect(url_for("user.settings"))
 
@@ -170,15 +171,17 @@ def update_payment_method():
 
     form = SubscriptionForm(
         stripe_key=current_app.config.get("STRIPE_PUBLISHABLE_KEY"),
-        plan=active_plan, name=current_user.name
+        plan=active_plan,
+        name=current_user.name,
     )
 
     if form.validate_on_submit():
         subscription = Subscription()
         updated = subscription.update_payment_method(
-            user=current_user, credit_card=card,
+            user=current_user,
+            credit_card=card,
             name=request.form.get("name"),
-            token=request.form.get("stripe_token")
+            token=request.form.get("stripe_token"),
         )
 
         if updated:
@@ -189,8 +192,10 @@ def update_payment_method():
         return redirect(url_for("user.settings"))
 
     return render_template(
-        "billing/payment_method.html", form=form, plan=active_plan,
-        card_last4=str(card.last4)
+        "billing/payment_method.html",
+        form=form,
+        plan=active_plan,
+        card_last4=str(card.last4),
     )
 
 
@@ -199,40 +204,41 @@ def update_payment_method():
 @login_required
 @handle_stripe_exceptions
 def billing_details(page):
-    paginated_invoices = Invoice \
-        .query \
-        .filter(Invoice.user_id == current_user.id) \
-        .order_by(Invoice.created_on.desc()) \
+    paginated_invoices = (
+        Invoice.query.filter(Invoice.user_id == current_user.id)
+        .order_by(Invoice.created_on.desc())
         .paginate(page, 12, True)
+    )
 
-    upcoming = Invoice.upcoming(current_user.payment_id) \
-        if current_user.subscription else None
-    coupon = Coupon.query \
-        .filter(Coupon.code == current_user.subscription.coupon).first() \
-        if current_user.subscription else None
+    upcoming = (
+        Invoice.upcoming(current_user.payment_id) if current_user.subscription else None
+    )
+    coupon = (
+        Coupon.query.filter(Coupon.code == current_user.subscription.coupon).first()
+        if current_user.subscription
+        else None
+    )
 
     return render_template(
-        "billing/billing_details.html", paginated_invoices=paginated_invoices,
-        upcoming=upcoming, coupon=coupon
+        "billing/billing_details.html",
+        paginated_invoices=paginated_invoices,
+        upcoming=upcoming,
+        coupon=coupon,
     )
 
 
 @bp.route("/purchase_coins", methods=["GET", "POST"])
 @login_required
 def purchase_coins():
-    form = PaymentForm(
-        stripe_key=current_app.config.get("STRIPE_PUBLISHABLE_KEY")
-    )
+    form = PaymentForm(stripe_key=current_app.config.get("STRIPE_PUBLISHABLE_KEY"))
 
     if form.validate_on_submit():
         coin_bundles = current_app.config.get("COIN_BUNDLES")
         coin_bundles_form = int(request.form.get("coin_bundles"))
 
-        bundle = next((
-            item
-            for item in coin_bundles
-            if item["coins"] == coin_bundles_form
-        ), None)
+        bundle = next(
+            (item for item in coin_bundles if item["coins"] == coin_bundles_form), None
+        )
 
         if bundle is not None:
             invoice = Invoice()
@@ -242,19 +248,19 @@ def purchase_coins():
                 amount=bundle.get("price_in_cents"),
                 coins=coin_bundles_form,
                 coupon=request.form.get("coupon_code"),
-                token=request.form.get("stripe_token")
+                token=request.form.get("stripe_token"),
             )
 
             if created:
                 flash(
-                    _("%(amount)s coins added to your account", amount=coin_bundles_form),   # noqa: E501
-                    "success"
+                    _(
+                        "%(amount)s coins added to your account",
+                        amount=coin_bundles_form,
+                    ),
+                    "success",
                 )
             else:
-                flash(
-                    _("You must enable JavaScript for this request"),
-                    "warning"
-                )
+                flash(_("You must enable JavaScript for this request"), "warning")
 
             return redirect(url_for("bet.place_bet"))
 

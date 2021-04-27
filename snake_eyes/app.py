@@ -1,8 +1,9 @@
-from logging.handlers import SMTPHandler
 from logging import ERROR
 from logging import Formatter
+from logging.handlers import SMTPHandler
 
 import stripe
+
 from celery import Celery
 from flask import Flask
 from flask import render_template
@@ -17,17 +18,17 @@ from snake_eyes.blueprints.billing import billing_bp
 from snake_eyes.blueprints.billing import stripe_webhook_bp
 from snake_eyes.blueprints.billing.template_processors import current_year
 from snake_eyes.blueprints.billing.template_processors import format_currency
-from snake_eyes.blueprints.page import page_bp
 from snake_eyes.blueprints.contact import contact_bp
+from snake_eyes.blueprints.page import page_bp
 from snake_eyes.blueprints.user import user_bp
 from snake_eyes.blueprints.user.models import User
 from snake_eyes.extensions import babel
+from snake_eyes.extensions import csrf
 from snake_eyes.extensions import db
 from snake_eyes.extensions import debug_toolbar
+from snake_eyes.extensions import limiter
 from snake_eyes.extensions import login_manager
 from snake_eyes.extensions import mail
-from snake_eyes.extensions import csrf
-from snake_eyes.extensions import limiter
 
 
 def create_app(settings_override=None):
@@ -83,7 +84,7 @@ def create_celery(app=None):
     celery = Celery(
         app.import_name,
         broker=app.config["CELERY_BROKER_URL"],
-        include=app.config["CELERY_TASK_LIST"]
+        include=app.config["CELERY_TASK_LIST"],
     )
     celery.conf.update(app.config)
 
@@ -155,6 +156,7 @@ def error_handler(app):
 
     :param app: Flask app instance
     """
+
     def render_status(status):
         """
         Render custom tempaltes for specific errors
@@ -181,7 +183,7 @@ def exception_handler(app):
         [app.config.get("MAIL_USERNAME")],
         "[Exception Handler] A 5xx was thrown",
         (app.config.get("MAIL_USERNAME"), app.config.get("MAIL_PASSWORD")),
-        secure=()
+        secure=(),
     )
     mail_handler.setLevel(ERROR)
     mail_handler.setFormatter(
@@ -219,11 +221,10 @@ def locale(app):
     :param app: Flask application instance
     :return: str
     """
+
     @babel.localeselector
     def get_locale():
         if current_user.is_authenticated:
             return current_user.locale
 
-        return request \
-            .accept_languages \
-            .best_match(app.config.get("LANGUAGES").keys())
+        return request.accept_languages.best_match(app.config.get("LANGUAGES").keys())

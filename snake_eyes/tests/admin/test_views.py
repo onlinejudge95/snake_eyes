@@ -36,11 +36,7 @@ class TestUsersView(ViewTestMixin):
 
         response = self.client.get(url_for("admin.users_edit", id=1))
 
-        assert_status_with_message(
-            200,
-            response,
-            "admin@localhost"
-        )
+        assert_status_with_message(200, response, "admin@localhost")
 
     def test_edit_user(self):
         """
@@ -48,22 +44,12 @@ class TestUsersView(ViewTestMixin):
         """
         self.login()
 
-        user = {
-            "role": "admin",
-            "username": "admin",
-            "active": True
-        }
+        user = {"role": "admin", "username": "admin", "active": True}
         response = self.client.post(
-            url_for("admin.users_edit", id=1),
-            data=user,
-            follow_redirects=True
+            url_for("admin.users_edit", id=1), data=user, follow_redirects=True
         )
 
-        assert_status_with_message(
-            200,
-            response,
-            "User has been saved successfully"
-        )
+        assert_status_with_message(200, response, "User has been saved successfully")
 
     def test_bulk_delete_invalid(self):
         """
@@ -72,20 +58,13 @@ class TestUsersView(ViewTestMixin):
         self.login()
 
         old_count = User.query.count()
-        bulk_ids = {
-            "scope": "all_selected_items",
-            "bulk_ids": [1]
-        }
+        bulk_ids = {"scope": "all_selected_items", "bulk_ids": [1]}
         response = self.client.post(
-            url_for("admin.users_bulk_delete"),
-            data=bulk_ids,
-            follow_redirects=True
+            url_for("admin.users_bulk_delete"), data=bulk_ids, follow_redirects=True
         )
 
         assert_status_with_message(
-            200,
-            response,
-            "0 users(s) were scheduled for deletion"
+            200, response, "0 users(s) were scheduled for deletion"
         )
 
         new_count = User.query.count()

@@ -2,25 +2,35 @@ from datetime import date
 from datetime import datetime
 
 from mock import Mock
-import pytest
+from pytest import fixture
 from pytz import utc
 
 from config import settings
 from lib.src.util_datetime import timedelta_month
 from snake_eyes.app import create_app
-from snake_eyes.extensions import db as _db
-from snake_eyes.blueprints.billing.gateways.stripecom import Card as PaymentCard  # noqa : E501
-from snake_eyes.blueprints.billing.gateways.stripecom import Coupon as PaymentCoupon  # noqa : E501
-from snake_eyes.blueprints.billing.gateways.stripecom import Event as PaymentEvent  # noqa : E501
-from snake_eyes.blueprints.billing.gateways.stripecom import Invoice as PaymentInvoice  # noqa : E501
-from snake_eyes.blueprints.billing.gateways.stripecom import Subscription as PaymentSubscription  # noqa : E501
+from snake_eyes.blueprints.billing.gateways.stripecom import (
+    Card as PaymentCard,
+)
+from snake_eyes.blueprints.billing.gateways.stripecom import (
+    Coupon as PaymentCoupon,
+)
+from snake_eyes.blueprints.billing.gateways.stripecom import (
+    Event as PaymentEvent,
+)
+from snake_eyes.blueprints.billing.gateways.stripecom import (
+    Invoice as PaymentInvoice,
+)
+from snake_eyes.blueprints.billing.gateways.stripecom import (
+    Subscription as PaymentSubscription,
+)
 from snake_eyes.blueprints.billing.models.coupon import Coupon
 from snake_eyes.blueprints.billing.models.credit_card import CreditCard
 from snake_eyes.blueprints.billing.models.subscription import Subscription
 from snake_eyes.blueprints.user.models import User
+from snake_eyes.extensions import db as _db
 
 
-@pytest.fixture(scope="session")
+@fixture(scope="session")
 def app():
     """
     Setup a test app for snake_eyes.
@@ -32,7 +42,7 @@ def app():
         "DEBUG": False,
         "WTF_CSRF_ENABLED": False,
         "TESTING": True,
-        "SQLALCHEMY_DATABASE_URI": f"{settings.SQLALCHEMY_DATABASE_URI}_test"
+        "SQLALCHEMY_DATABASE_URI": f"{settings.SQLALCHEMY_DATABASE_URI}_test",
     }
     test_app = create_app(settings_override=params)
 
@@ -40,7 +50,7 @@ def app():
         yield test_app
 
 
-@pytest.fixture(scope="function")
+@fixture(scope="function")
 def client(app):
     """
     Setup a test client from the snake_eyes app.
@@ -52,7 +62,7 @@ def client(app):
     yield app.test_client()
 
 
-@pytest.fixture(scope="session")
+@fixture(scope="session")
 def db(app):
     """
     Setup a db for testing.
@@ -64,11 +74,7 @@ def db(app):
     _db.drop_all()
     _db.create_all()
 
-    params = {
-        "role": "admin",
-        "email": "admin@localhost",
-        "password": "password"
-    }
+    params = {"role": "admin", "email": "admin@localhost", "password": "password"}
 
     admin = User(**params)
 
@@ -78,7 +84,7 @@ def db(app):
     return _db
 
 
-@pytest.fixture(scope="function")
+@fixture(scope="function")
 def session(db):
     """
     Speeds up testing using rollbacks and nested session.
@@ -94,7 +100,7 @@ def session(db):
     db.session.rollback()
 
 
-@pytest.fixture(scope="session")
+@fixture(scope="session")
 def token(db):
     """
     Serialize a JWS token
@@ -106,7 +112,7 @@ def token(db):
     return User.find_by_identity("admin@localhost").serialize_token()
 
 
-@pytest.fixture(scope="function")
+@fixture(scope="function")
 def users(db):
     """
     Create user fixtures.
@@ -120,7 +126,7 @@ def users(db):
 
     users = [
         {"role": "admin", "email": "admin@localhost", "password": "password"},
-        {"active": False, "email": "disabl@localhost", "password": "password"}
+        {"active": False, "email": "disabl@localhost", "password": "password"},
     ]
 
     for user in users:
@@ -131,7 +137,7 @@ def users(db):
     return db
 
 
-@pytest.fixture(scope="function")
+@fixture(scope="function")
 def credit_cards(db):
     """
     Create fixture for credit cards
@@ -144,13 +150,12 @@ def credit_cards(db):
     june_1_2021 = utc.localize(datetime(2021, 6, 14, 0, 0, 0))
 
     credit_cards = [
+        {"user_id": 1, "brand": "Visa", "last4": 4242, "exp_date": june_1_2021},
         {
-            "user_id": 1, "brand": "Visa", "last4": 4242,
-            "exp_date": june_1_2021
-        },
-        {
-            "user_id": 2, "brand": "Visa", "last4": 4242,
-            "exp_date": timedelta_month(12, may_1_2021)
+            "user_id": 2,
+            "brand": "Visa",
+            "last4": 4242,
+            "exp_date": timedelta_month(12, may_1_2021),
         },
     ]
 
@@ -161,7 +166,7 @@ def credit_cards(db):
     return db
 
 
-@pytest.fixture(scope="function")
+@fixture(scope="function")
 def coupons(db):
     """
     Create coupon fixtures.
@@ -188,7 +193,7 @@ def coupons(db):
     return db
 
 
-@pytest.fixture(scope="function")
+@fixture(scope="function")
 def subscriptions(db):
     """
     Create subscription fixtures.
@@ -208,7 +213,7 @@ def subscriptions(db):
         "email": "subscriber@localhost",
         "name": "test_user",
         "password": "password",
-        "payment_id": "customer_000"
+        "payment_id": "customer_000",
     }
 
     subscriber = User(**params)
@@ -216,10 +221,7 @@ def subscriptions(db):
     db.session.add(subscriber)
     db.session.commit()
 
-    params = {
-        "user_id": subscriber.id,
-        "plan": "gold"
-    }
+    params = {"user_id": subscriber.id, "plan": "gold"}
 
     subscription = Subscription(**params)
     db.session.add(subscription)
@@ -228,7 +230,7 @@ def subscriptions(db):
         "user_id": subscriber.id,
         "brand": "Visa",
         "last4": "4242",
-        "exp_date": date(2021, 6, 1)
+        "exp_date": date(2021, 6, 1),
     }
     credit_card = CreditCard(**params)
     db.session.add(credit_card)
@@ -238,7 +240,7 @@ def subscriptions(db):
     return db
 
 
-@pytest.fixture(scope="session")
+@fixture(scope="session")
 def mock_stripe():
     """
     Mock all of the Stripe API calls.
@@ -258,10 +260,7 @@ def mock_stripe():
                     "amount": 0,
                     "currency": "usd",
                     "proration": False,
-                    "period": {
-                        "start": 1433161742,
-                        "end": 1434371342
-                    },
+                    "period": {"start": 1433161742, "end": 1434371342},
                     "subscription": None,
                     "quantity": 1,
                     "plan": {
@@ -275,19 +274,17 @@ def mock_stripe():
                         "livemode": False,
                         "interval_count": 1,
                         "trial_period_days": 14,
-                        "metadata": {
-                        },
-                        "statement_descriptor": "GOLD MONTHLY"
+                        "metadata": {},
+                        "statement_descriptor": "GOLD MONTHLY",
                     },
                     "description": None,
                     "discountable": True,
-                    "metadata": {
-                    }
+                    "metadata": {},
                 }
             ],
             "total_count": 1,
             "object": "list",
-            "url": "/v1/invoices/in_000/lines"
+            "url": "/v1/invoices/in_000/lines",
         },
         "subtotal": 0,
         "total": 0,
@@ -311,11 +308,10 @@ def mock_stripe():
         "subscription": "sub_000",
         "tax_percent": None,
         "tax": None,
-        "metadata": {
-        },
+        "metadata": {},
         "statement_descriptor": None,
         "description": None,
-        "receipt_number": None
+        "receipt_number": None,
     }
     PaymentCoupon.create = Mock(return_value={})
     PaymentCoupon.delete = Mock(return_value={})

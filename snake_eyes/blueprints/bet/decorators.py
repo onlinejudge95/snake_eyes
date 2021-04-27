@@ -12,6 +12,7 @@ def coins_required(function):
 
     :return: Function
     """
+
     @wraps(function)
     def decorated_function(*args, **kwargs):
         if current_user.coins == 0:

@@ -14,16 +14,16 @@ from lib.src.util_money import cents_to_dollars
 from lib.src.util_money import dollars_to_cents
 from lib.src.util_sqlalchemy import AwareDateTime
 from lib.src.util_sqlalchemy import ResourceMixin
-from snake_eyes.blueprints.billing.gateways.stripecom import Coupon as PaymentCoupon  # noqa: E501
+from snake_eyes.blueprints.billing.gateways.stripecom import (
+    Coupon as PaymentCoupon,
+)
 from snake_eyes.extensions import db
 
 
 class Coupon(ResourceMixin, db.Model):
-    DURATION = OrderedDict([
-        ("forever", "Forever"),
-        ("once", "Once"),
-        ("repeating", "Repeating")
-    ])
+    DURATION = OrderedDict(
+        [("forever", "Forever"), ("once", "Once"), ("repeating", "Repeating")]
+    )
 
     __tablename__ = "coupons"
 
@@ -34,7 +34,7 @@ class Coupon(ResourceMixin, db.Model):
         db.Enum(*DURATION, name="duration_types"),
         index=True,
         nullable=False,
-        server_default="forever"
+        server_default="forever",
     )
 
     amount_off = db.Column(db.Integer())
@@ -43,17 +43,11 @@ class Coupon(ResourceMixin, db.Model):
     duration_in_months = db.Column(db.Integer())
     max_redemptions = db.Column(db.Integer(), index=True)
     redeem_by = db.Column(AwareDateTime(), index=True)
-    times_redeemed = db.Column(
-        db.Integer(),
-        index=True,
-        nullable=False,
-        default=0
-    )
+    times_redeemed = db.Column(db.Integer(), index=True, nullable=False, default=0)
     valid = db.Column(db.Boolean(), nullable=False, server_default="1")
 
     def __init__(self, **kwargs):
-        self.code = self.code.upper() \
-            if self.code else Coupon.random_coupon_code()
+        self.code = self.code.upper() if self.code else Coupon.random_coupon_code()
         super(Coupon, self).__init__(**kwargs)
 
     @hybrid_property
@@ -64,8 +58,7 @@ class Coupon(ResourceMixin, db.Model):
         :return: SQLAlchemy query object
         """
         is_redeemable = or_(
-            self.redeem_by.is_(None),
-            self.redeem_by >= datetime.now(utc)
+            self.redeem_by.is_(None), self.redeem_by >= datetime.now(utc)
         )
 
         return and_(self.valid, is_redeemable)
@@ -109,10 +102,9 @@ class Coupon(ResourceMixin, db.Model):
         :type compare_datetime: date
         :return: SQLAlchemy commit object
         """
-        Coupon \
-            .query \
-            .filter(Coupon.redeem_by <= compare_datetime) \
-            .update({Coupon.valid: not Coupon.valid})
+        Coupon.query.filter(Coupon.redeem_by <= compare_datetime).update(
+            {Coupon.valid: not Coupon.valid}
+        )
 
         return db.session.commit()
 
@@ -141,9 +133,9 @@ class Coupon(ResourceMixin, db.Model):
 
         if "redeem_by" in payment_params:
             if payment_params.get("redeem_by") is not None:
-                payment_params["redeem_by"] = payment_params\
-                    .get("redeem_by") \
-                    .replace(tzinfo=UTC)
+                payment_params["redeem_by"] = payment_params.get("redeem_by").replace(
+                    tzinfo=UTC
+                )
 
         coupon = Coupon(**payment_params)
 
@@ -186,10 +178,9 @@ class Coupon(ResourceMixin, db.Model):
         :type code: str
         :return: Coupon instance
         """
-        return Coupon \
-            .query \
-            .filter(Coupon.redeemable, Coupon.code == code.upper()) \
-            .first()
+        return Coupon.query.filter(
+            Coupon.redeemable, Coupon.code == code.upper()
+        ).first()
 
     def redeem(self):
         """
@@ -213,7 +204,7 @@ class Coupon(ResourceMixin, db.Model):
         """
         params = {
             "duration": self.duration,
-            "duration_in_months": self.duration_in_months
+            "duration_in_months": self.duration_in_months,
         }
 
         if self.amount_off:
@@ -235,6 +226,6 @@ class Coupon(ResourceMixin, db.Model):
         if self.amount_off:
             amount -= self.amount_off
         elif self.percent_off:
-            amount *= (1 - (self.percent_off * 0.01))
+            amount *= 1 - (self.percent_off * 0.01)
 
         return int(amount)
