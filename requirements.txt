@@ -1,5 +1,5 @@
 Flask==1.1.2
-werkzeug==0.14.1
+werkzeug==1.0.1
 gunicorn==19.4.5
 
 pytest==5.1.0
