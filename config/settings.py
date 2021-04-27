@@ -21,8 +21,12 @@ MAIL_PASSWORD = environ.get("MAIL_PASSWORD")
 LANGUAGES = {"en": "English", "kl": "Klingon"}
 BABEL_DEFAULT_LOCALE = "en"
 
-CELERY_BROKER_URL = environ.get("CELERY_BROKER_URL", "redis://:devpassword@redis:6379/0")
-CELERY_RESULT_BACKEND = environ.get("CELERY_RESULT_BACKEND", "redis://:devpassword@redis:6379/0")
+CELERY_BROKER_URL = environ.get(
+    "CELERY_BROKER_URL", "redis://:devpassword@redis:6379/0"
+)
+CELERY_RESULT_BACKEND = environ.get(
+    "CELERY_RESULT_BACKEND", "redis://:devpassword@redis:6379/0"
+)
 CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = CELERY_TASK_SERIALIZER
@@ -43,7 +47,10 @@ CELERYBEAT_SCHEDULE = {
     },
 }
 
-SQLALCHEMY_DATABASE_URI = environ.get("SQLALCHEMY_DATABASE_URI", "postgresql://snake_eyes:devpassword@postgres:5432/snake_eyes")
+SQLALCHEMY_DATABASE_URI = environ.get(
+    "SQLALCHEMY_DATABASE_URI",
+    "postgresql://snake_eyes:devpassword@postgres:5432/snake_eyes",
+)
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 SEED_ADMIN_EMAIL = environ.get("SEED_ADMIN_EMAIL", "admin@localhost")
