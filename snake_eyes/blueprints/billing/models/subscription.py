@@ -1,12 +1,19 @@
 from datetime import datetime
+
 from pytz import utc
 
 from config import settings
 from lib.src.util_sqlalchemy import ResourceMixin
 from snake_eyes.blueprints.bet.models.coin import add_subscription_coins
-from snake_eyes.blueprints.billing.gateways.stripecom import Card as PaymentCard  # noqa: E501
-from snake_eyes.blueprints.billing.gateways.stripecom import Customer as PaymentCustomer  # noqa: E501
-from snake_eyes.blueprints.billing.gateways.stripecom import Subscription as PaymentSubscription  # noqa: E501
+from snake_eyes.blueprints.billing.gateways.stripecom import (
+    Card as PaymentCard,
+)
+from snake_eyes.blueprints.billing.gateways.stripecom import (
+    Customer as PaymentCustomer,
+)
+from snake_eyes.blueprints.billing.gateways.stripecom import (
+    Subscription as PaymentSubscription,
+)
 from snake_eyes.blueprints.billing.models.coupon import Coupon
 from snake_eyes.blueprints.billing.models.credit_card import CreditCard
 from snake_eyes.extensions import db

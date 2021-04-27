@@ -1,7 +1,7 @@
 from sqlalchemy import func
 
-from snake_eyes.blueprints.billing.models.subscription import Subscription
 from snake_eyes.blueprints.bet.models.bet import Bet
+from snake_eyes.blueprints.billing.models.subscription import Subscription
 from snake_eyes.blueprints.user.models import User
 from snake_eyes.blueprints.user.models import db
 

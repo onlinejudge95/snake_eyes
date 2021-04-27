@@ -5,8 +5,8 @@ from wtforms import BooleanField
 from wtforms import DateTimeField
 from wtforms import FloatField
 from wtforms import IntegerField
-from wtforms import StringField
 from wtforms import SelectField
+from wtforms import StringField
 from wtforms.validators import DataRequired
 from wtforms.validators import Length
 from wtforms.validators import NumberRange

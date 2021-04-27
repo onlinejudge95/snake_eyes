@@ -14,7 +14,9 @@ from lib.src.util_money import cents_to_dollars
 from lib.src.util_money import dollars_to_cents
 from lib.src.util_sqlalchemy import AwareDateTime
 from lib.src.util_sqlalchemy import ResourceMixin
-from snake_eyes.blueprints.billing.gateways.stripecom import Coupon as PaymentCoupon  # noqa: E501
+from snake_eyes.blueprints.billing.gateways.stripecom import (
+    Coupon as PaymentCoupon,
+)
 from snake_eyes.extensions import db
 
 

@@ -1,5 +1,5 @@
-from stripe import Coupon as StripeCoupon
 from stripe import Charge as StripeCharge
+from stripe import Coupon as StripeCoupon
 from stripe import Customer as StripeCustomer
 from stripe import Event as StripeEvent
 from stripe import Invoice as StripeInvoice

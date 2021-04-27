@@ -11,7 +11,8 @@ from sqlalchemy import or_
 from werkzeug.security import check_password_hash
 from werkzeug.security import generate_password_hash
 
-from lib.src.util_sqlalchemy import AwareDateTime, ResourceMixin
+from lib.src.util_sqlalchemy import AwareDateTime
+from lib.src.util_sqlalchemy import ResourceMixin
 from snake_eyes.blueprints.bet.models.bet import Bet
 from snake_eyes.blueprints.billing.models.credit_card import CreditCard
 from snake_eyes.blueprints.billing.models.invoice import Invoice
@@ -142,7 +143,9 @@ class User(UserMixin, ResourceMixin, db.Model):
         user = User.find_by_identity(identity)
         reset_token = user.serialize_token()
 
-        from snake_eyes.blueprints.user.tasks import deliever_password_reset_mail  # noqa: E501
+        from snake_eyes.blueprints.user.tasks import (  # noqa: E501
+            deliever_password_reset_mail,
+        )
         deliever_password_reset_mail.delay(user.id, reset_token)
 
         return user

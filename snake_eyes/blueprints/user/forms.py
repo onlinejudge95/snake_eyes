@@ -16,7 +16,9 @@ from lib.src.util_forms import ModelForm
 from lib.src.util_forms import choices_from_dict
 from snake_eyes.blueprints.user.models import User
 from snake_eyes.blueprints.user.models import db
-from snake_eyes.blueprints.user.validations import ensure_existing_password_matches  # noqa: E501
+from snake_eyes.blueprints.user.validations import (
+    ensure_existing_password_matches,
+)
 from snake_eyes.blueprints.user.validations import ensure_identity_exists
 
 

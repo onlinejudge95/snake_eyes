@@ -3,9 +3,15 @@ from datetime import datetime
 from sqlalchemy import or_
 
 from lib.src.util_sqlalchemy import ResourceMixin
-from snake_eyes.blueprints.billing.gateways.stripecom import Charge as PaymentCharge  # noqa: E501
-from snake_eyes.blueprints.billing.gateways.stripecom import Customer as PaymentCustomer  # noqa: E501
-from snake_eyes.blueprints.billing.gateways.stripecom import Invoice as PaymentInvoice  # noqa: E501
+from snake_eyes.blueprints.billing.gateways.stripecom import (
+    Charge as PaymentCharge,
+)
+from snake_eyes.blueprints.billing.gateways.stripecom import (
+    Customer as PaymentCustomer,
+)
+from snake_eyes.blueprints.billing.gateways.stripecom import (
+    Invoice as PaymentInvoice,
+)
 from snake_eyes.blueprints.billing.models.coupon import Coupon
 from snake_eyes.blueprints.billing.models.credit_card import CreditCard
 from snake_eyes.extensions import db

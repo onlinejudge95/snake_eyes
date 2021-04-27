@@ -2,25 +2,35 @@ from datetime import date
 from datetime import datetime
 
 from mock import Mock
-import pytest
+from pytest import fixture
 from pytz import utc
 
 from config import settings
 from lib.src.util_datetime import timedelta_month
 from snake_eyes.app import create_app
-from snake_eyes.extensions import db as _db
-from snake_eyes.blueprints.billing.gateways.stripecom import Card as PaymentCard  # noqa : E501
-from snake_eyes.blueprints.billing.gateways.stripecom import Coupon as PaymentCoupon  # noqa : E501
-from snake_eyes.blueprints.billing.gateways.stripecom import Event as PaymentEvent  # noqa : E501
-from snake_eyes.blueprints.billing.gateways.stripecom import Invoice as PaymentInvoice  # noqa : E501
-from snake_eyes.blueprints.billing.gateways.stripecom import Subscription as PaymentSubscription  # noqa : E501
+from snake_eyes.blueprints.billing.gateways.stripecom import (
+    Card as PaymentCard,
+)
+from snake_eyes.blueprints.billing.gateways.stripecom import (
+    Coupon as PaymentCoupon,
+)
+from snake_eyes.blueprints.billing.gateways.stripecom import (
+    Event as PaymentEvent,
+)
+from snake_eyes.blueprints.billing.gateways.stripecom import (
+    Invoice as PaymentInvoice,
+)
+from snake_eyes.blueprints.billing.gateways.stripecom import (
+    Subscription as PaymentSubscription,
+)
 from snake_eyes.blueprints.billing.models.coupon import Coupon
 from snake_eyes.blueprints.billing.models.credit_card import CreditCard
 from snake_eyes.blueprints.billing.models.subscription import Subscription
 from snake_eyes.blueprints.user.models import User
+from snake_eyes.extensions import db as _db
 
 
-@pytest.fixture(scope="session")
+@fixture(scope="session")
 def app():
     """
     Setup a test app for snake_eyes.
@@ -40,7 +50,7 @@ def app():
         yield test_app
 
 
-@pytest.fixture(scope="function")
+@fixture(scope="function")
 def client(app):
     """
     Setup a test client from the snake_eyes app.
@@ -52,7 +62,7 @@ def client(app):
     yield app.test_client()
 
 
-@pytest.fixture(scope="session")
+@fixture(scope="session")
 def db(app):
     """
     Setup a db for testing.
@@ -78,7 +88,7 @@ def db(app):
     return _db
 
 
-@pytest.fixture(scope="function")
+@fixture(scope="function")
 def session(db):
     """
     Speeds up testing using rollbacks and nested session.
@@ -94,7 +104,7 @@ def session(db):
     db.session.rollback()
 
 
-@pytest.fixture(scope="session")
+@fixture(scope="session")
 def token(db):
     """
     Serialize a JWS token
@@ -106,7 +116,7 @@ def token(db):
     return User.find_by_identity("admin@localhost").serialize_token()
 
 
-@pytest.fixture(scope="function")
+@fixture(scope="function")
 def users(db):
     """
     Create user fixtures.
@@ -131,7 +141,7 @@ def users(db):
     return db
 
 
-@pytest.fixture(scope="function")
+@fixture(scope="function")
 def credit_cards(db):
     """
     Create fixture for credit cards
@@ -161,7 +171,7 @@ def credit_cards(db):
     return db
 
 
-@pytest.fixture(scope="function")
+@fixture(scope="function")
 def coupons(db):
     """
     Create coupon fixtures.
@@ -188,7 +198,7 @@ def coupons(db):
     return db
 
 
-@pytest.fixture(scope="function")
+@fixture(scope="function")
 def subscriptions(db):
     """
     Create subscription fixtures.
@@ -238,7 +248,7 @@ def subscriptions(db):
     return db
 
 
-@pytest.fixture(scope="session")
+@fixture(scope="session")
 def mock_stripe():
     """
     Mock all of the Stripe API calls.

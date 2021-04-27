@@ -4,7 +4,9 @@ from click import echo
 from click import group
 
 from snake_eyes.app import create_app
-from snake_eyes.blueprints.billing.gateways.stripecom import Plan as PaymentPlan  # noqa: E501
+from snake_eyes.blueprints.billing.gateways.stripecom import (
+    Plan as PaymentPlan,
+)
 from snake_eyes.extensions import db
 
 
