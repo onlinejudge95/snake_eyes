@@ -1,4 +1,4 @@
-version: "2"
+version: "3.8"
 
 
 volumes:
@@ -36,8 +36,7 @@ services:
     build:
       context: "."
       dockerfile: "Dockerfile"
-    environment:
-      PYTHONUNBUFFERED: "true"
+    env_file: .env
 
   celery:
     image: "celery"
@@ -48,5 +47,4 @@ services:
     build:
       context: "."
       dockerfile: "Dockerfile"
-    environment:
-      PYTHONUNBUFFERED: "true"
+    env_file: .env
