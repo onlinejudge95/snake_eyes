@@ -2,7 +2,16 @@ from subprocess import call
 
 from click import argument
 from click import command
+from click import group
 from click import option
+
+
+@group()
+def cli():
+    """
+    Run linting related tasks
+    """
+    pass
 
 
 @command()
@@ -12,7 +21,7 @@ from click import option
     help="Skip __init__.py files?"
 )
 @argument("path", default="/snake_eyes")
-def cli(skip_init, path):
+def flake8(skip_init, path):
     """
     Run linting with flake8.
 
@@ -23,5 +32,25 @@ def cli(skip_init, path):
     :return: Subprocess call result
     """
     flag = ",__init__.py" if skip_init else ""
-    shell_command = f"flake8 --exclude instance*{flag} {path}"
+    shell_command = f"flake8 --exclude instance*,venv,migrations{flag} {path}"
     return call(shell_command, shell=True)
+
+
+@command()
+@option("--check-only/--no-check-only", default=False, help="Only check and do not sort")
+@argument("path", default="/snake_eyes")
+def isort(check_only, path):
+    """
+    Run linting with isort.
+
+    :param path: path for sorting imports
+
+    :return: Subprocess call result
+    """
+    flag = "--check-only" if check_only else ""
+    shell_command = f"isort --atomic --force-single-line-imports --lines-after-imports 2 --lines-between-types 1 --line-length 79 --profile black --skip migrations --skip venv {flag} {path}"
+    return call(shell_command, shell=True)
+
+
+cli.add_command(flake8)
+cli.add_command(isort)

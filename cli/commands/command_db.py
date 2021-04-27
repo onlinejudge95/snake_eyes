@@ -2,7 +2,6 @@ from subprocess import call
 
 from click import argument
 from click import command
-from click import echo
 from click import group
 
 
@@ -27,7 +26,6 @@ def migration(message, revision_id):
 def upgrade(revision):
     shell_command = f"alembic upgrade {revision}"
     return call(shell_command, shell=True)
-
 
 
 @command()
