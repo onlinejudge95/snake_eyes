@@ -29,7 +29,7 @@ def flake8(skip_init, path):
     """
     flag = ",__init__.py" if skip_init else ""
     shell_command = (
-        f"flake8 --max-line-length 88 --exclude instance*,venv,migrations{flag} {path}"
+        f"flake8 --max-line-length 88 --exclude venv,migrations{flag} {path}"
     )
     return call(shell_command, shell=True)
 
@@ -48,8 +48,8 @@ def isort(check_only, path):
     flag = "--check-only" if check_only else ""
     shell_command = (
         "isort --atomic --force-single-line-imports"
-        "--lines-after-imports 2 --lines-between-types 1 --line-length 79"
-        f"--profile black --skip migrations --skip venv {flag} {path}"
+        " --lines-after-imports 2 --lines-between-types 1 --line-length 79"
+        f" --profile black --skip migrations --skip venv {flag} {path}"
     )
     return call(shell_command, shell=True)
 

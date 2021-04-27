@@ -1,4 +1,4 @@
-version: "2"
+version: "3.8"
 
 
 volumes:
@@ -30,23 +30,19 @@ services:
     command: "gunicorn --config 'python:config.gunicorn' --reload snake_eyes.app:create_app()"
     volumes:
       - ".:/snake_eyes"
-      - "./instance:/snake_eyes/instance"
     ports:
       - "8000:8000"
     build:
       context: "."
       dockerfile: "Dockerfile"
-    environment:
-      PYTHONUNBUFFERED: "true"
+    env_file: .env
 
   celery:
     image: "celery"
     command: "celery worker --beat --app snake_eyes.blueprints.contact.tasks --loglevel info"
     volumes:
       - ".:/snake_eyes"
-      - "./instance:/snake_eyes/instance"
     build:
       context: "."
       dockerfile: "Dockerfile"
-    environment:
-      PYTHONUNBUFFERED: "true"
+    env_file: .env
