@@ -42,7 +42,6 @@ services:
     command: "celery worker --beat --app snake_eyes.blueprints.contact.tasks --loglevel info"
     volumes:
       - ".:/snake_eyes"
-      - "./instance:/snake_eyes/instance"
     build:
       context: "."
       dockerfile: "Dockerfile"
