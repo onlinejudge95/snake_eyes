@@ -83,9 +83,7 @@ class Invoice(ResourceMixin, db.Model):
             "payment_id": data["customer"],
             "plan": data["lines"]["data"][0]["plan"]["name"],
             "receipt_number": data["receipt_number"],
-            "description": data["lines"]["data"][0]["plan"][
-                "statement_descriptor"
-            ],  # noqa: E501
+            "description": data["lines"]["data"][0]["plan"]["statement_descriptor"],
             "period_start_on": datetime.utcfromtimestamp(
                 data["lines"]["data"][0]["period"]["start"]
             ).date(),

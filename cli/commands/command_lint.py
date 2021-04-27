@@ -28,7 +28,9 @@ def flake8(skip_init, path):
     :return: Subprocess call result
     """
     flag = ",__init__.py" if skip_init else ""
-    shell_command = f"flake8 --exclude instance*,venv,migrations{flag} {path}"
+    shell_command = (
+        f"flake8 --max-line-length 88 --exclude instance*,venv,migrations{flag} {path}"
+    )
     return call(shell_command, shell=True)
 
 
@@ -44,7 +46,11 @@ def isort(check_only, path):
     :return: Subprocess call result
     """
     flag = "--check-only" if check_only else ""
-    shell_command = f"isort --atomic --force-single-line-imports --lines-after-imports 2 --lines-between-types 1 --line-length 79 --profile black --skip migrations --skip venv {flag} {path}"
+    shell_command = (
+        "isort --atomic --force-single-line-imports"
+        "--lines-after-imports 2 --lines-between-types 1 --line-length 79"
+        f"--profile black --skip migrations --skip venv {flag} {path}"
+    )
     return call(shell_command, shell=True)
 
 

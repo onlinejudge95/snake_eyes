@@ -133,7 +133,7 @@ class User(UserMixin, ResourceMixin, db.Model):
         user = User.find_by_identity(identity)
         reset_token = user.serialize_token()
 
-        from snake_eyes.blueprints.user.tasks import (  # noqa: E501
+        from snake_eyes.blueprints.user.tasks import (
             deliever_password_reset_mail,
         )
 

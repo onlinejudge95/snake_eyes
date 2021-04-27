@@ -256,7 +256,7 @@ def purchase_coins():
                     _(
                         "%(amount)s coins added to your account",
                         amount=coin_bundles_form,
-                    ),  # noqa: E501
+                    ),
                     "success",
                 )
             else:
