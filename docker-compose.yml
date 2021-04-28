@@ -36,6 +36,8 @@ services:
       context: "."
       dockerfile: "Dockerfile"
     env_file: .env
+    environment:
+      APP_TYPE: web
 
   celery:
     image: "celery"
@@ -46,3 +48,5 @@ services:
       context: "."
       dockerfile: "Dockerfile"
     env_file: .env
+    environment:
+      APP_TYPE: worker
