@@ -15,6 +15,7 @@ jobs:
       - name: "Deploy the web app"
         uses: "akhileshns/heroku-deploy@v3.12.12"
         with:
+          docker_heroku_process_type: web
           heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
           heroku_app_name: snake-eyes-web
           heroku_email: ${{ secrets.HEROKU_EMAIL }}
@@ -23,6 +24,7 @@ jobs:
       - name: "Deploy the worker app"
         uses: "akhileshns/heroku-deploy@v3.12.12"
         with:
+          docker_heroku_process_type: worker
           heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
           heroku_app_name: snake-eyes-worker
           heroku_email: ${{ secrets.HEROKU_EMAIL }}
