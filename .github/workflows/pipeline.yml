@@ -1,14 +1,10 @@
-name: "Pipeline"
+name: "pipeline"
 
 on:
   push:
     branches: [ "master" ]
   pull_request:
     branches: [ "master" ]
-
-# env:
-#   BACKEND_IMAGE_NAME_HEROKU_REGISTRY: registry.heroku.com/snake-eyes-backend/web
-#   WORKER_IMAGE_NAME_HEROKU_REGISTRY: registry.heroku.com/snake-eyes-worker/web
 
 jobs:
   build:
@@ -39,29 +35,7 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
 
-      - name: Image digest
+      - name: "Image digest"
         run: echo ${{ steps.docker_build.outputs.digest }}
 
-  # push:
-  #   needs: build
-  #   runs-on: "ubuntu-latest"
-  #   steps:
-  #     - uses: "actions/checkout@v2"
-
-  #     - name: "Pull the current docker image for backend and worker"
-  #       run: |
-  #         echo "${{ secrets.GITHUB_TOKEN }}" | docker login --username ${{ github.actor }} --password-stdin docker.pkg.github.com
-  #         docker image pull $IMAGE_NAME_GITHUB_REGISTRY:$GITHUB_SHA
-
-  #     - name: "Login the heroku docker registry"
-  #       run: docker login --username _ --password ${{ secrets.HEROKU_AUTH_TOKEN }} registry.heroku.com
-
-  #     - name: "Tag and Push the Docker image for backend"
-  #       run: |
-  #         docker image tag $IMAGE_NAME_GITHUB_REGISTRY:$GITHUB_SHA $BACKEND_IMAGE_NAME_HEROKU_REGISTRY:$GITHUB_SHA
-  #         docker image push $BACKEND_IMAGE_NAME_HEROKU_REGISTRY:$GITHUB_SHA
-
-  #     - name: "Tag Push the Docker image for worker"
-  #       run: |
-  #         docker image tag $IMAGE_NAME_GITHUB_REGISTRY:$GITHUB_SHA $WORKER_IMAGE_NAME_HEROKU_REGISTRY:$GITHUB_SHA
-  #         docker image push $WORKER_IMAGE_NAME_HEROKU_REGISTRY:$GITHUB_SHA
+# https://github.com/marketplace/actions/deploy-to-heroku#deploy-with-docker
