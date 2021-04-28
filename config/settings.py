@@ -4,7 +4,6 @@ from os import environ
 from celery.schedules import crontab
 
 
-DEBUG = True
 LOG_LEVEL = "DEBUG"
 
 SERVER_NAME = environ.get("SERVER_NAME", "localhost:8000")
@@ -98,10 +97,10 @@ STRIPE_PLANS = {
 }
 
 COIN_BUNDLES = [
-    {"coins": 100, "price_in_cents": 100, "label": "100 for $1"},
-    {"coins": 1000, "price_in_cents": 900, "label": "1,000 for $9"},
-    {"coins": 5000, "price_in_cents": 4000, "label": "5,000 for $40"},
-    {"coins": 10000, "price_in_cents": 7000, "label": "10,000 for $70"},
+    {"coins": 100, "price_in_cents": 100, "label": "100 for ₹75"},
+    {"coins": 1000, "price_in_cents": 900, "label": "1,000 for ₹670"},
+    {"coins": 5000, "price_in_cents": 4000, "label": "5,000 for ₹2980"},
+    {"coins": 10000, "price_in_cents": 7000, "label": "10,000 for ₹5220"},
 ]
 
 DICE_ROLL_PAYOUT = {
