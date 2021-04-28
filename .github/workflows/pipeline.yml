@@ -29,7 +29,10 @@ jobs:
         uses: "docker/build-push-action@v2"
         with:
           push: true
-          tags: $IMAGE_NAME_GITHUB_REGISTRY:$GITHUB_SHA
+          tags: onlinejudge95/snake_eyes/snake_eyes:$GITHUB_SHA
+
+      - name: Image digest
+        run: echo ${{ steps.docker_build.outputs.digest }}
 
   #     - name: "Build the Docker image"
   #       run: |
