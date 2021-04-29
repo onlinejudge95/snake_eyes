@@ -13,4 +13,4 @@ COPY . .
 
 RUN pip install --editable /snake_eyes
 
-CMD gunicorn --config "python:config.gunicorn" "snake_eyes.app:create_app()"
+CMD bash bin/entrypoint.sh

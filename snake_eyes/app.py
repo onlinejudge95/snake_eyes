@@ -10,7 +10,7 @@ from flask import render_template
 from flask import request
 from flask_login import current_user
 from itsdangerous import URLSafeTimedSerializer
-from werkzeug.contrib.fixers import ProxyFix
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 from snake_eyes.blueprints.admin import admin_bp
 from snake_eyes.blueprints.bet import bet_bp
@@ -25,7 +25,6 @@ from snake_eyes.blueprints.user.models import User
 from snake_eyes.extensions import babel
 from snake_eyes.extensions import csrf
 from snake_eyes.extensions import db
-from snake_eyes.extensions import debug_toolbar
 from snake_eyes.extensions import limiter
 from snake_eyes.extensions import login_manager
 from snake_eyes.extensions import mail
@@ -108,7 +107,6 @@ def init_extensions(app):
     :param app: Flask application isntance
     """
     db.init_app(app)
-    debug_toolbar.init_app(app)
     login_manager.init_app(app)
     mail.init_app(app)
     csrf.init_app(app)

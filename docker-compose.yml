@@ -34,8 +34,9 @@ services:
       - "8000:8000"
     build:
       context: "."
-      dockerfile: "Dockerfile"
     env_file: .env
+    environment:
+      APP_TYPE: web
 
   celery:
     image: "celery"
@@ -44,5 +45,6 @@ services:
       - ".:/snake_eyes"
     build:
       context: "."
-      dockerfile: "Dockerfile"
     env_file: .env
+    environment:
+      APP_TYPE: worker
