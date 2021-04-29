@@ -6,7 +6,7 @@ Click==7.1.2
 
 psycopg2==2.8.3
 Flask-SQLAlchemy==2.1
-SQLAlchemy==1.2.0
+SQLAlchemy==1.2.2
 alembic==0.8.6
 redis==3.3.7
 celery==4.4.0
