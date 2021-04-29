@@ -17,7 +17,8 @@ MAIL_USE_SSL = False
 MAIL_USERNAME = environ.get("MAIL_USERNAME")
 MAIL_PASSWORD = environ.get("MAIL_PASSWORD")
 
-LANGUAGES = {"en": "English", "kl": "Klingon"}
+# LANGUAGES = {"en": "English", "kl": "Klingon"}
+LANGUAGES = {"en": "English"}
 BABEL_DEFAULT_LOCALE = "en"
 
 CELERY_BROKER_URL = environ.get(
