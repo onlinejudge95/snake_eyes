@@ -104,11 +104,6 @@ def users_edit(id):
     user = User.query.get(id)
     form = UserForm(obj=user)
 
-    # invoices = Invoice.billing_history(current_user)
-
-    upcoming = (
-        Invoice.upcoming(current_user.payment_id) if current_user.subscription else None
-    )
     coupon = (
         Coupon.query.filter(Coupon.code == current_user.subscription.coupon).first()
         if current_user.subscription
@@ -136,8 +131,6 @@ def users_edit(id):
         "admin/user/edit.html",
         form=form,
         user=user,
-        invoices=invoices,
-        upcoming=upcoming,
         coupon=coupon,
     )
 
@@ -237,7 +230,7 @@ def coupons_bulk_delete():
 def invoices(page):
     search_form = SearchForm()
     sort_by = Invoice.sort_by(
-        request.arge.get("sort", "created_on"), request.arge.get("direction", "desc")
+        request.args.get("sort", "created_on"), request.args.get("direction", "desc")
     )
     order_values = f"invoices.{sort_by[0]} {sort_by[1]}"
     paginated_invoices = (
