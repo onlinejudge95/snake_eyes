@@ -3,6 +3,7 @@ from datetime import datetime
 from hashlib import md5
 
 from flask import current_app
+from flask import url_for
 from flask_login import UserMixin
 from itsdangerous import TimedJSONWebSignatureSerializer
 from itsdangerous import URLSafeTimedSerializer
@@ -137,7 +138,7 @@ class User(UserMixin, ResourceMixin, db.Model):
             deliever_password_reset_mail,
         )
 
-        deliever_password_reset_mail.delay(user.id, reset_token)
+        deliever_password_reset_mail.delay(user.id, url_for("user.password_reset", reset_token=reset_token, _external=True))
 
         return user
 
