@@ -10,7 +10,6 @@ from flask import render_template
 from flask import request
 from flask_login import current_user
 from itsdangerous import URLSafeTimedSerializer
-# from werkzeug.middleware.proxy_fix import ProxyFix
 from werkzeug.contrib.fixers import ProxyFix
 
 from snake_eyes.blueprints.admin import admin_bp
