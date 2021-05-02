@@ -1,6 +1,14 @@
 version: "3.8"
 
 
+networks:
+  email:
+    name: email_service_email
+    external: true
+  website:
+  website-postgres:
+  website-redis:
+
 volumes:
   postgres-data:
   redis-data:
@@ -9,8 +17,8 @@ volumes:
 services:
   postgres:
     image: "postgres:9.5"
-    ports:
-      - "5432:5432"
+    networks:
+      - website-postgres
     volumes:
       - "postgres-data:/var/lib/postgresql/data"
     environment:
@@ -20,6 +28,8 @@ services:
   redis:
     command: "redis-server --requirepass devpassword"
     image: "redis:3.0-alpine"
+    networks:
+      - website-redis
     ports:
       - "6379:6379"
     volumes:
@@ -28,6 +38,10 @@ services:
   website:
     image: "website"
     command: "gunicorn --config 'python:config.gunicorn' --reload snake_eyes.app:create_app()"
+    networks:
+      - website
+      - website-redis
+      - website-postgres
     volumes:
       - ".:/snake_eyes"
     ports:
@@ -41,6 +55,11 @@ services:
   celery:
     image: "celery"
     command: "celery worker --beat --app snake_eyes.blueprints.contact.tasks --loglevel info"
+    networks:
+      - email
+      - website
+      - website-postgres
+      - website-redis
     volumes:
       - ".:/snake_eyes"
     build:
