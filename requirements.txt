@@ -1,19 +1,18 @@
-Flask==0.12.3
-werkzeug==0.15.3
-gunicorn==19.5.0
+Flask==0.10.1
+werkzeug==0.14.1
+gunicorn==19.4.5
 
 Click==7.1.2
 
 psycopg2==2.8.3
 Flask-SQLAlchemy==2.1
-SQLAlchemy==1.2.19
+SQLAlchemy==1.2.0
 alembic==0.8.6
 redis==3.3.7
 celery==4.4.0
 
 Flask-WTF==0.9.5
 WTForms-Components==0.9.7
-Flask-Mail==0.9.1
 Flask-Login==0.3.2
 Flask-Limiter==0.9.3
 Flask-Babel==0.9

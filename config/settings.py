@@ -17,7 +17,7 @@ MAIL_USE_SSL = False
 MAIL_USERNAME = environ.get("MAIL_USERNAME")
 MAIL_PASSWORD = environ.get("MAIL_PASSWORD")
 
-LANGUAGES = {"en": "English", "kl": "Klingon"}
+LANGUAGES = {"en": "English"}
 BABEL_DEFAULT_LOCALE = "en"
 
 CELERY_BROKER_URL = environ.get(
@@ -122,3 +122,4 @@ RATELIMIT_STRATEGY = "fixed-window-elastic-expiry"
 RATELIMIT_HEADERS_ENABLED = True
 
 ANALYTICS_GOOGLE_UA = environ.get("ANALYTICS_GOOGLE_UA")
+EMAIL_SERVICE_HOST = environ.get("EMAIL_SERVICE_HOST")
