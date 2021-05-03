@@ -27,7 +27,6 @@ from snake_eyes.extensions import csrf
 from snake_eyes.extensions import db
 from snake_eyes.extensions import limiter
 from snake_eyes.extensions import login_manager
-from snake_eyes.extensions import mail
 
 
 def create_app(settings_override=None):
@@ -108,7 +107,6 @@ def init_extensions(app):
     """
     db.init_app(app)
     login_manager.init_app(app)
-    mail.init_app(app)
     csrf.init_app(app)
     limiter.init_app(app)
     babel.init_app(app)

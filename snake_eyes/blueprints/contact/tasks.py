@@ -1,6 +1,5 @@
 from uuid import uuid4
 from snake_eyes.app import create_celery
-from config.settings import EMAIL_SERVICE_HOST
 from requests import post
 from requests.exceptions import RequestException
 
@@ -19,7 +18,7 @@ def deliver_contact_email(email, message):
     :return: None
     """
     try:
-        url = f"{EMAIL_SERVICE_HOST}/api/email/"
+        url = f"{celery.conf.get('EMAIL_SERVICE_HOST')}/api/email/"
         payload = {
             "sender": email,
             "receiver": celery.conf.get("MAIL_USERNAME"),

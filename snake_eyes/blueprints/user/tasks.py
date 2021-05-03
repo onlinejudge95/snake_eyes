@@ -2,8 +2,6 @@ from uuid import uuid4
 
 from snake_eyes.app import create_celery
 from snake_eyes.blueprints.user.models import User
-from config.settings import EMAIL_SERVICE_HOST
-from config.settings import MAIL_DEFAULT_SENDER
 from requests import post
 from requests.exceptions import RequestException
 
@@ -25,9 +23,9 @@ def deliever_password_reset_mail(user_id, reset_password_url):
 
     if user is not None:
         try:
-            url = f"{EMAIL_SERVICE_HOST}/api/email/"
+            url = f"{celery.conf.get('EMAIL_SERVICE_HOST')}/api/email/"
             payload = {
-                "sender": MAIL_DEFAULT_SENDER,
+                "sender": celery.conf.get("MAIL_DEFAULT_SENDER"),
                 "receiver": user.email,
                 "subject": "Password reset from snake eyes",
                 "template_id": 2,
